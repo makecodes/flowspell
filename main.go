@@ -1,37 +1,57 @@
 package main
 
 import (
-    "log"
-    "flowspell/handlers"
-    "flowspell/db"
-    "github.com/gin-gonic/gin"
-    "github.com/joho/godotenv"
+	"flowspell/db"
+	"flowspell/handlers"
+	"log"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	"flowspell/docs"
 )
 
 func main() {
-    err := godotenv.Load()
-    if err != nil {
-        log.Fatalf("Error loading .env file")
-    }
+	docs.SwaggerInfo.Title = "FlowSpell"
+	docs.SwaggerInfo.Description = "FlowSpell API"
+	docs.SwaggerInfo.Version = "1.0"
+	docs.SwaggerInfo.Host = "http://localhost:8266"
+	docs.SwaggerInfo.BasePath = ""
+	docs.SwaggerInfo.Schemes = []string{"http"}
 
-    dbConnection, err := db.GetDBConnection()
-    if err != nil {
-        log.Fatalf("Error connecting to database")
-    }
+	godotenv.Load()
 
-    flowDefinitionHandler := handlers.FlowDefinitionHandler{DB: dbConnection}
+	dbConnection, err := db.GetDBConnection()
+	if err != nil {
+		log.Fatalf("Error connecting to database")
+	}
 
-    router := gin.Default()
+	flowDefinitionHandler := handlers.FlowDefinitionHandler{DB: dbConnection}
+	flowInstanceHandler := handlers.FlowInstanceHandler{DB: dbConnection}
 
-    florDefinitionsGroup := router.Group("/flows/definitions")
-    {
-        florDefinitionsGroup.GET("/", flowDefinitionHandler.GetFlowDefinitions)
-        florDefinitionsGroup.POST("/", flowDefinitionHandler.CreateFlowDefinition)
-        florDefinitionsGroup.GET("/:id", flowDefinitionHandler.GetFlowDefinition)
-        florDefinitionsGroup.PUT("/:id", flowDefinitionHandler.UpdateFlowDefinition)
-        florDefinitionsGroup.DELETE("/:id", flowDefinitionHandler.DeleteFlowDefinition)
-    }
+	router := gin.Default()
 
-    router.Run(":8266")
+	flowsGroup := router.Group("/flows")
+	{
+		flowDefinitionsGroup := flowsGroup.Group("/definitions")
+		{
+			flowDefinitionsGroup.GET("/", flowDefinitionHandler.GetFlowDefinitions)
+			flowDefinitionsGroup.POST("/", flowDefinitionHandler.CreateFlowDefinition)
+			flowDefinitionsGroup.GET("/:referenceId", flowDefinitionHandler.GetFlowDefinition)
+			flowDefinitionsGroup.PUT("/:referenceId", flowDefinitionHandler.UpdateFlowDefinition)
+			flowDefinitionsGroup.PATCH("/:referenceId", flowDefinitionHandler.UpdateFlowDefinition)
+			flowDefinitionsGroup.DELETE("/:referenceId", flowDefinitionHandler.DeleteFlowDefinition)
+		}
+
+		flowInstancesGroup := flowsGroup.Group("/instances")
+		{
+			flowInstancesGroup.GET("/", flowInstanceHandler.GetFlowInstances)
+			flowInstancesGroup.POST("/", flowInstanceHandler.CreateFlowInstance)
+		}
+	}
+
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	router.Run(":8266")
 }
-

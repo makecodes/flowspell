@@ -102,6 +102,7 @@ func (h *FlowDefinitionHandler) GetFlowDefinition(c *gin.Context) {
 	c.JSON(http.StatusOK, flowDefinition)
 }
 
+// Delete a flow definition by its ID
 func (h *FlowDefinitionHandler) DeleteFlowDefinition(c *gin.Context) {
 	referenceId := c.Param("referenceId")
 	result := h.DB.Where("reference_id = ?", referenceId).Delete(&models.FlowDefinition{})

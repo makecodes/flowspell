@@ -7,18 +7,17 @@ import (
 )
 
 type FlowInstance struct {
-	ID                  int            `json:"id" gorm:"primaryKey"`
-	CreatedAt           time.Time      `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt           time.Time      `json:"updated_at" gorm:"autoUpdateTime"`
-	StartedAt           time.Time      `json:"started_at"`
-	EndedAt             time.Time      `json:"ended_at"`
-	ErrorAt             time.Time      `json:"error_at"`
-	FlowDefinitionID    int            `json:"flow_definition_id"`
-	FlowDefinitionRefID string         `json:"flow_definition_ref_id"`
-	FlowDefinition      FlowDefinition `json:"flow_definition" gorm:"foreignKey:FlowDefinitionID"`
-	Status              string         `json:"status" gorm:"type:flow_instances_status" default:"not_started"`
-	Version             int            `json:"version" default:"1"`
-	Metadata            JSONB          `json:"metadata" gorm:"type:jsonb"`
+	ID                  int        `json:"id" gorm:"primaryKey"`
+	CreatedAt           time.Time  `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt           time.Time  `json:"updated_at" gorm:"autoUpdateTime"`
+	StartedAt           *time.Time `json:"started_at"`
+	EndedAt             *time.Time `json:"ended_at"`
+	ErrorAt             *time.Time `json:"error_at"`
+	FlowDefinitionID    *int       `json:"flow_definition_id"`
+	FlowDefinitionRefID string     `json:"flow_definition_ref_id"`
+	Status              string     `json:"status" gorm:"type:flow_instances_status" default:"not_started"`
+	Version             int        `json:"version" default:"1"`
+	Metadata            JSONB      `json:"metadata" gorm:"type:jsonb"`
 }
 
 // Constants
@@ -42,5 +41,21 @@ func (f *FlowInstance) BeforeCreate(tx *gorm.DB) (err error) {
 	if f.Metadata == nil {
 		f.Metadata = make(map[string]interface{})
 	}
+
+	// Get FlowDefinition by reference_id the last version
+	flowDefinition, err := (&FlowDefinition{}).GetFlowDefinitionByReferenceID(tx, f.FlowDefinitionRefID)
+	if err != nil {
+		return
+	}
+
+	if flowDefinition != nil && f.FlowDefinitionID == nil {
+		f.FlowDefinitionID = &flowDefinition.ID
+	}
+
+	// Default Version
+	f.CreatedAt = time.Now()
+	f.UpdatedAt = time.Now()
+	f.ErrorAt = nil
+
 	return
 }

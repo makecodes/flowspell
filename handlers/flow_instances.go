@@ -4,6 +4,7 @@ import (
 	"flowspell/models"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -31,6 +32,7 @@ func (h *FlowInstanceHandler) findFlowDefinitionByID(id string) (*models.FlowIns
 func (h *FlowInstanceHandler) GetFlowInstances(c *gin.Context) {
 	limit := 25
 	offset := 0
+	flowDefinitionID := 0
 
 	if c.Query("limit") != "" {
 		if l, err := strconv.Atoi(c.Query("limit")); err == nil && l > 0 {
@@ -48,8 +50,20 @@ func (h *FlowInstanceHandler) GetFlowInstances(c *gin.Context) {
 		}
 	}
 
+	if c.Query("flow_definition") != "" {
+		_, err := strconv.Atoi(c.Query("flow_definition"))
+		if err != nil {
+			h.respondWithError(c, http.StatusBadRequest, err)
+			return
+		}
+	}
+
 	var flowInstances []models.FlowInstance
 	result := h.DB.Limit(limit).Offset(offset).Find(&flowInstances)
+
+	if flowDefinitionID != 0 {
+		result = h.DB.Where("flow_definition_id = ?", flowDefinitionID).Limit(limit).Offset(offset).Find(&flowInstances)
+	}
 
 	if result.Error != nil {
 		h.respondWithError(c, http.StatusInternalServerError, result.Error)
@@ -66,19 +80,25 @@ func (h *FlowInstanceHandler) CreateFlowInstance(c *gin.Context) {
 		return
 	}
 
-	// Default status
-	if flowInstance.Status == "" {
-		flowInstance.Status = models.FlowInstanceStatusNotStarted
-	}
-
-	// Default Metadata
-	if flowInstance.Metadata == nil {
-		flowInstance.Metadata = make(map[string]interface{})
-	}
-
 	if result := h.DB.Create(&flowInstance); result.Error != nil {
 		h.respondWithError(c, http.StatusInternalServerError, result.Error)
 		return
 	}
 	c.JSON(http.StatusCreated, flowInstance)
+}
+
+// Start a flow instance
+func (h *FlowInstanceHandler) StartFlowInstance(c *gin.Context) {
+	id := c.Param("referenceId")
+	flowInstance, err := h.findFlowDefinitionByID(id)
+	if err != nil {
+		h.respondWithError(c, http.StatusNotFound, err)
+		return
+	}
+
+	// Start the flow instance
+	now := time.Now()
+	flowInstance.StartedAt = &now
+	flowInstance.Status = models.FlowInstanceStatusRunning
+
 }

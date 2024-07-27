@@ -1,3 +1,4 @@
+BEGIN;
 CREATE TYPE flow_definitions_status AS ENUM ('active', 'inactive');
 CREATE TABLE flow_definitions (
     id SERIAL PRIMARY KEY,
@@ -18,7 +19,7 @@ CREATE TYPE flow_instances_status AS ENUM (
     'running',
     'completed',
     'failed',
-    'stopped',
+    'stopped'
 );
 CREATE TABLE flow_instances (
     id SERIAL PRIMARY KEY,
@@ -33,3 +34,5 @@ CREATE TABLE flow_instances (
     version INTEGER NOT NULL DEFAULT 1,
     metadata JSONB
 );
+
+COMMIT;

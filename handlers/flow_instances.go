@@ -72,20 +72,20 @@ func (h *FlowInstanceHandler) GetFlowInstances(c *gin.Context) {
 	c.JSON(http.StatusOK, flowInstances)
 }
 
-// Create a new flow instance
-func (h *FlowInstanceHandler) CreateFlowInstance(c *gin.Context) {
-	var flowInstance models.FlowInstance
-	if err := c.ShouldBindJSON(&flowInstance); err != nil {
-		h.respondWithError(c, http.StatusBadRequest, err)
-		return
-	}
+// // Create a new flow instance
+// func (h *FlowInstanceHandler) CreateFlowInstance(c *gin.Context) {
+// 	var flowInstance models.FlowInstance
+// 	if err := c.ShouldBindJSON(&flowInstance); err != nil {
+// 		h.respondWithError(c, http.StatusBadRequest, err)
+// 		return
+// 	}
 
-	if result := h.DB.Create(&flowInstance); result.Error != nil {
-		h.respondWithError(c, http.StatusInternalServerError, result.Error)
-		return
-	}
-	c.JSON(http.StatusCreated, flowInstance)
-}
+// 	if result := h.DB.Create(&flowInstance); result.Error != nil {
+// 		h.respondWithError(c, http.StatusInternalServerError, result.Error)
+// 		return
+// 	}
+// 	c.JSON(http.StatusCreated, flowInstance)
+// }
 
 // Start a flow instance
 func (h *FlowInstanceHandler) StartFlowInstance(c *gin.Context) {
@@ -96,9 +96,7 @@ func (h *FlowInstanceHandler) StartFlowInstance(c *gin.Context) {
 		return
 	}
 
-	// Start the flow instance
 	now := time.Now()
 	flowInstance.StartedAt = &now
 	flowInstance.Status = models.FlowInstanceStatusRunning
-
 }

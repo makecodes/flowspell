@@ -16,7 +16,6 @@ type FlowInstance struct {
 	FlowDefinitionID    *int       `json:"flow_definition_id"`
 	FlowDefinitionRefID string     `json:"flow_definition_ref_id"`
 	Status              string     `json:"status" gorm:"type:flow_instances_status" default:"not_started"`
-	Version             int        `json:"version" default:"1"`
 	InputData           JSONB      `json:"input_data" gorm:"type:jsonb"`
 	OutputData          JSONB      `json:"output_data" gorm:"type:jsonb"`
 	Metadata            JSONB      `json:"metadata" gorm:"type:jsonb"`

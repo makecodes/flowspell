@@ -16,7 +16,6 @@ CREATE TABLE flow_definitions (
 );
 
 CREATE TYPE flow_instances_status AS ENUM (
-    'not_started',
     'waiting',
     'running',
     'completed',

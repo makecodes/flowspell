@@ -1,8 +1,11 @@
 package models
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
+	"github.com/kaptinlin/jsonschema"
 	"gorm.io/gorm"
 )
 
@@ -58,6 +61,52 @@ func (f *FlowInstance) BeforeCreate(tx *gorm.DB) (err error) {
 
 	if f.OutputData == nil {
 		f.OutputData = make(map[string]interface{})
+	}
+
+	// Validating the input data against the input schema
+	inputJSONSchema, err := ConvertJSONBToString(flowDefinition.InputSchema)
+	if err != nil {
+		return err
+	}
+
+	compiler := jsonschema.NewCompiler()
+	schema, err := compiler.Compile([]byte(inputJSONSchema))
+	if err != nil {
+		return err
+	}
+
+	inputData, err := ConvertJSONBToMap(f.InputData)
+	if err != nil {
+		return
+	}
+
+	result := schema.Validate(inputData)
+	if !result.IsValid() {
+		schemaUrl := flowDefinition.InputSchema["$id"]
+		err = errors.New("input data is not valid, refer to the schema: " + fmt.Sprintf("%v", schemaUrl))
+		return err
+	}
+
+	if f.Status == FlowInstanceStatusCompleted {
+		// Validating the output data against the output schema
+		outputJSONSchema, err := ConvertJSONBToString(flowDefinition.OutputSchema)
+		if err != nil {
+			return err
+		}
+
+		compiler = jsonschema.NewCompiler()
+		schema, err = compiler.Compile([]byte(outputJSONSchema))
+		if err != nil {
+			return err
+		}
+
+		outputData, _ := ConvertJSONBToMap(f.OutputData)
+		result := schema.Validate(outputData)
+		if !result.IsValid() {
+			schemaUrl := flowDefinition.OutputSchema["$id"]
+			err = errors.New("input data is not valid, refer to the schema: " + fmt.Sprintf("%v", schemaUrl))
+			return err
+		}
 	}
 
 	// Default Version

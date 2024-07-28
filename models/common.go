@@ -89,6 +89,29 @@ func (f *FlowDefinition) GetFlowDefinitionByReferenceID(db *gorm.DB, referenceID
 	return &flowDefinition, nil
 }
 
+// Convert JSONB to String
+func ConvertJSONBToString(jsonb JSONB) (string, error) {
+	jsonData, err := json.Marshal(jsonb)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonData), nil
+}
+
+// Convert JSONB to map[string]interface{}{}
+func ConvertJSONBToMap(jsonb JSONB) (map[string]interface{}, error) {
+	jsonData, err := json.Marshal(jsonb)
+	if err != nil {
+		return nil, err
+	}
+	var data map[string]interface{}
+	err = json.Unmarshal(jsonData, &data)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
+}
+
 // Convert JSONB to SimplifiedSchema
 func ConvertJSONBToSimplifiedSchema(jsonb JSONB) (SimplifiedSchema, error) {
 	jsonData, err := json.Marshal(jsonb)

@@ -89,14 +89,23 @@ func (h *FlowInstanceHandler) GetFlowInstances(c *gin.Context) {
 
 // Start a flow instance
 func (h *FlowInstanceHandler) StartFlowInstance(c *gin.Context) {
-	id := c.Param("referenceId")
-	flowInstance, err := h.findFlowDefinitionByID(id)
-	if err != nil {
-		h.respondWithError(c, http.StatusNotFound, err)
+	referenceId := c.Param("referenceId")
+
+	var flowInstance models.FlowInstance
+	if err := c.ShouldBindJSON(&flowInstance); err != nil {
+		h.respondWithError(c, http.StatusBadRequest, err)
 		return
 	}
+
+	flowInstance.FlowDefinitionRefID = referenceId
 
 	now := time.Now()
 	flowInstance.StartedAt = &now
 	flowInstance.Status = models.FlowInstanceStatusRunning
+
+	if result := h.DB.Create(&flowInstance); result.Error != nil {
+		h.respondWithError(c, http.StatusInternalServerError, result.Error)
+		return
+	}
+	c.JSON(http.StatusCreated, flowInstance)
 }

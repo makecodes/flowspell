@@ -13,16 +13,6 @@ type FlowDefinitionHandler struct {
 	DB *gorm.DB
 }
 
-// Find a flow definition by its ID
-func (h *FlowDefinitionHandler) findFlowDefinitionByReferenceID(refrenceId string) (*models.FlowDefinition, error) {
-	var flowDefinition models.FlowDefinition
-	result := h.DB.Where("reference_id = ?", refrenceId).Order("version desc").First(&flowDefinition)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &flowDefinition, nil
-}
-
 // Helper function to respond with an error
 func (h *FlowDefinitionHandler) respondWithError(c *gin.Context, status int, err error) {
 	c.JSON(status, gin.H{"error": err.Error()})

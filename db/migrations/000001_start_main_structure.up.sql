@@ -9,6 +9,8 @@ CREATE TABLE flow_definitions (
     description TEXT,
     status flow_definitions_status NOT NULL DEFAULT 'inactive',
     version INTEGER NOT NULL DEFAULT 1,
+    input_schema JSONB,
+    output_schema JSONB,
     metadata JSONB,
     UNIQUE(reference_id, name, version)
 );
@@ -32,6 +34,8 @@ CREATE TABLE flow_instances (
     flow_definition_ref_id UUID NOT NULL,
     status flow_instances_status NOT NULL DEFAULT 'not_started',
     version INTEGER NOT NULL DEFAULT 1,
+    input_data JSONB,
+    output_data JSONB,
     metadata JSONB
 );
 

@@ -17,6 +17,8 @@ type FlowInstance struct {
 	FlowDefinitionRefID string     `json:"flow_definition_ref_id"`
 	Status              string     `json:"status" gorm:"type:flow_instances_status" default:"not_started"`
 	Version             int        `json:"version" default:"1"`
+	InputData           JSONB      `json:"input_data" gorm:"type:jsonb"`
+	OutputData          JSONB      `json:"output_data" gorm:"type:jsonb"`
 	Metadata            JSONB      `json:"metadata" gorm:"type:jsonb"`
 }
 
@@ -50,6 +52,14 @@ func (f *FlowInstance) BeforeCreate(tx *gorm.DB) (err error) {
 
 	if flowDefinition != nil && f.FlowDefinitionID == nil {
 		f.FlowDefinitionID = &flowDefinition.ID
+	}
+
+	if f.InputData == nil {
+		f.InputData = make(map[string]interface{})
+	}
+
+	if f.OutputData == nil {
+		f.OutputData = make(map[string]interface{})
 	}
 
 	// Default Version

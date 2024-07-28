@@ -84,7 +84,21 @@ func (h *FlowDefinitionHandler) CreateFlowDefinition(c *gin.Context) {
 		h.respondWithError(c, http.StatusInternalServerError, result.Error)
 		return
 	}
-	c.JSON(http.StatusCreated, flowDefinition)
+	response := FlowDefinitionResponse{
+		ID:           flowDefinition.ID,
+		ReferenceID:  flowDefinition.ReferenceID,
+		CreatedAt:    flowDefinition.CreatedAt,
+		UpdatedAt:    flowDefinition.UpdatedAt,
+		Name:         flowDefinition.Name,
+		Description:  flowDefinition.Description,
+		Status:       flowDefinition.Status,
+		Version:      flowDefinition.Version,
+		InputSchema:  flowDefinition.InputSchema,
+		OutputSchema: flowDefinition.OutputSchema,
+		Metadata:     flowDefinition.Metadata,
+	}
+
+	c.JSON(http.StatusCreated, response)
 }
 
 // Get a flow definition by its ID
@@ -140,4 +154,37 @@ func (h *FlowDefinitionHandler) UpdateFlowDefinition(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, flowDefinition)
+}
+
+// handle the /schemas/flow_definitions/:referenceId/:type.json endpoint
+func (h *FlowDefinitionHandler) GetFlowDefinitionSchema(c *gin.Context) {
+	referenceId := c.Param("referenceId")
+	flowDefinition, err := h.findFlowDefinitionByReferenceID(referenceId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			h.respondWithError(c, http.StatusNotFound, err)
+		} else {
+			h.respondWithError(c, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	var schema models.JSONB
+	schemaType := c.Param("type")
+
+	switch schemaType {
+	case "input.json":
+		schema = flowDefinition.InputSchema
+	case "output.json":
+		schema = flowDefinition.OutputSchema
+	default:
+		h.respondWithError(c, http.StatusBadRequest, &CustomError{
+			Message: map[string]string{
+				"type": "Invalid schema type",
+			},
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, schema)
 }

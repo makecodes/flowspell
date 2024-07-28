@@ -1,6 +1,7 @@
 package models
 
 import (
+	"os"
 	"time"
 
 	"github.com/google/uuid"
@@ -16,6 +17,8 @@ type FlowDefinition struct {
 	Description  string    `json:"description"`
 	Status       string    `json:"status" gorm:"type:flow_definition_status" default:"inactive"`
 	Version      int       `json:"version" default:"1"`
+	Input        JSONB     `json:"input" gorm:"-"`
+	Output       JSONB     `json:"output" gorm:"-"`
 	InputSchema  JSONB     `json:"input_schema" gorm:"type:jsonb"`
 	OutputSchema JSONB     `json:"output_schema" gorm:"type:jsonb"`
 	Metadata     JSONB     `json:"metadata" gorm:"type:jsonb"`
@@ -29,6 +32,7 @@ const (
 
 // BeforeCreate hook
 func (f *FlowDefinition) BeforeCreate(tx *gorm.DB) (err error) {
+	flowspellHost := os.Getenv("FLOWSPELL_HOST")
 	if f.ReferenceID == "" {
 		f.ReferenceID = uuid.New().String()
 	}
@@ -43,13 +47,43 @@ func (f *FlowDefinition) BeforeCreate(tx *gorm.DB) (err error) {
 		f.Metadata = make(map[string]interface{})
 	}
 
-	if f.InputSchema == nil {
-		f.InputSchema = make(map[string]interface{})
+	// Verify if the f.Input schema is valid
+	convertedInput, err := ConvertJSONBToSimplifiedSchema(f.Input)
+	if err != nil {
+		return err
 	}
 
-	if f.OutputSchema == nil {
-		f.OutputSchema = make(map[string]interface{})
+	schemaDataInput := SchemaData{
+		Host:        flowspellHost,
+		ReferenceID: f.ReferenceID,
+		Type:        "input",
 	}
+
+	completeInputSchema, err := CompleteSchema(convertedInput, schemaDataInput)
+	if err != nil {
+		return err
+	}
+
+	f.InputSchema = completeInputSchema
+
+	// Verify if the f.Output schema is valid
+	convertedOutput, err := ConvertJSONBToSimplifiedSchema(f.Output)
+	if err != nil {
+		return err
+	}
+
+	schemaDataOutput := SchemaData{
+		Host:        flowspellHost,
+		ReferenceID: f.ReferenceID,
+		Type:        "input",
+	}
+
+	completeOutputSchema, err := CompleteSchema(convertedOutput, schemaDataOutput)
+	if err != nil {
+		return err
+	}
+
+	f.OutputSchema = completeOutputSchema
 
 	f.CreatedAt = time.Now()
 	f.UpdatedAt = time.Now()

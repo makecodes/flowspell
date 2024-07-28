@@ -31,7 +31,7 @@ CREATE TABLE flow_instances (
     error_at TIMESTAMP,
     flow_definition_id INTEGER NOT NULL REFERENCES flow_definitions(id),
     flow_definition_ref_id UUID NOT NULL,
-    status flow_instances_status NOT NULL DEFAULT 'not_started',
+    status flow_instances_status NOT NULL DEFAULT 'waiting',
     version INTEGER NOT NULL DEFAULT 1,
     input_data JSONB,
     output_data JSONB,

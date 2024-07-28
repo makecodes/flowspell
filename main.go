@@ -53,6 +53,9 @@ func main() {
 		}
 	}
 
+	// JSONSchema
+	router.GET("/schemas/flow_definitions/:referenceId/:type", flowDefinitionHandler.GetFlowDefinitionSchema)
+
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	router.Run(":8266")
 }

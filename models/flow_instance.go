@@ -15,7 +15,7 @@ type FlowInstance struct {
 	ErrorAt             *time.Time `json:"error_at"`
 	FlowDefinitionID    *int       `json:"flow_definition_id"`
 	FlowDefinitionRefID string     `json:"flow_definition_ref_id"`
-	Status              string     `json:"status" gorm:"type:flow_instances_status" default:"not_started"`
+	Status              string     `json:"status" gorm:"type:flow_instances_status" default:"waiting"`
 	InputData           JSONB      `json:"input_data" gorm:"type:jsonb"`
 	OutputData          JSONB      `json:"output_data" gorm:"type:jsonb"`
 	Metadata            JSONB      `json:"metadata" gorm:"type:jsonb"`
@@ -23,19 +23,18 @@ type FlowInstance struct {
 
 // Constants
 const (
-	FlowInstanceStatusNotStarted = "not_started"
-	FlowInstanceWaiting          = "waiting"
-	FlowInstanceStatusRunning    = "running"
-	FlowInstanceStatusCompleted  = "completed"
-	FlowInstanceStatusFailed     = "failed"
-	FlowInstanceStatusStopped    = "stopped"
+	FlowInstanceStatusWaiting   = "waiting"
+	FlowInstanceStatusRunning   = "running"
+	FlowInstanceStatusCompleted = "completed"
+	FlowInstanceStatusFailed    = "failed"
+	FlowInstanceStatusStopped   = "stopped"
 )
 
 // BeforeCreate hook
 func (f *FlowInstance) BeforeCreate(tx *gorm.DB) (err error) {
 	// Default status is inactive
 	if f.Status == "" {
-		f.Status = FlowInstanceStatusNotStarted
+		f.Status = FlowInstanceStatusWaiting
 	}
 
 	// Default Metadata

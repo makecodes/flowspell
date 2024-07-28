@@ -24,12 +24,6 @@ type FlowDefinition struct {
 	Metadata     JSONB     `json:"metadata" gorm:"type:jsonb"`
 }
 
-// Constants
-const (
-	FlowDefinitionStatusActive   = "active"
-	FlowDefinitionStatusInactive = "inactive"
-)
-
 // BeforeCreate hook
 func (f *FlowDefinition) BeforeCreate(tx *gorm.DB) (err error) {
 	flowspellHost := os.Getenv("FLOWSPELL_HOST")

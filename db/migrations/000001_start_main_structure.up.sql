@@ -38,4 +38,24 @@ CREATE TABLE flow_instances (
     metadata JSONB
 );
 
+
+CREATE TABLE task_definitions (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    reference_id UUID NOT NULL,
+    flow_definition_id INTEGER NOT NULL REFERENCES flow_definitions(id),
+    flow_definition_ref_id UUID NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    parent_task_id INTEGER,
+    input_schema JSONB,
+    output_schema JSONB,
+    version INTEGER NOT NULL DEFAULT 1,
+    metadata JSONB,
+    CONSTRAINT fk_parent_task
+        FOREIGN KEY(parent_task_id)
+        REFERENCES task_definitions(id)
+);
+
 COMMIT;

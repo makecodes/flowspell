@@ -32,6 +32,20 @@ type SchemaData struct {
 	Type        string
 }
 
+// Constants
+const (
+    // FlowDefinition
+	FlowDefinitionStatusActive   = "active"
+	FlowDefinitionStatusInactive = "inactive"
+
+    // FlowInstance
+    FlowInstanceStatusWaiting   = "waiting"
+	FlowInstanceStatusRunning   = "running"
+	FlowInstanceStatusCompleted = "completed"
+	FlowInstanceStatusFailed    = "failed"
+	FlowInstanceStatusStopped   = "stopped"
+)
+
 func CompleteSchema(simplified SimplifiedSchema, schemaData SchemaData) (map[string]interface{}, error) {
 	// Replace data
 	templateContent, err := template.New("schema").Parse(flowDefinitionBaseSchema)

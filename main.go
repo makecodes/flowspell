@@ -30,6 +30,7 @@ func main() {
 
 	flowDefinitionHandler := handlers.FlowDefinitionHandler{DB: dbConnection}
 	flowInstanceHandler := handlers.FlowInstanceHandler{DB: dbConnection}
+    taskDefinitionHandler := handlers.TaskDefinitionHandler{DB: dbConnection}
 
 	router := gin.Default()
 
@@ -41,17 +42,24 @@ func main() {
 			flowDefinitionsGroup.POST("/", flowDefinitionHandler.CreateFlowDefinition)
 			flowDefinitionsGroup.GET("/:referenceId", flowDefinitionHandler.GetFlowDefinition)
 			flowDefinitionsGroup.PUT("/:referenceId", flowDefinitionHandler.UpdateFlowDefinition)
-			flowDefinitionsGroup.PATCH("/:referenceId", flowDefinitionHandler.UpdateFlowDefinition)
 			flowDefinitionsGroup.DELETE("/:referenceId", flowDefinitionHandler.DeleteFlowDefinition)
 		}
 
 		flowInstancesGroup := flowsGroup.Group("/instances")
 		{
 			flowInstancesGroup.GET("/", flowInstanceHandler.GetFlowInstances)
-			// flowInstancesGroup.POST("/", flowInstanceHandler.CreateFlowInstance)
 			flowInstancesGroup.POST("/:referenceId/start", flowInstanceHandler.StartFlowInstance)
 		}
 	}
+
+    tasksGroup := router.Group("/tasks")
+    {
+        taskDefinitionsGroup := tasksGroup.Group("/definitions")
+        {
+            taskDefinitionsGroup.GET("/", taskDefinitionHandler.GetTaskDefinitions)
+            taskDefinitionsGroup.POST("/", taskDefinitionHandler.CreateTaskDefinition)
+        }
+    }
 
 	// JSONSchema
 	router.GET("/schemas/flow_definitions/:referenceId/:type", flowDefinitionHandler.GetFlowDefinitionSchema)

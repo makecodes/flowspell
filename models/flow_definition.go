@@ -87,7 +87,11 @@ func (f *FlowDefinition) BeforeCreate(tx *gorm.DB) (err error) {
 
 	f.CreatedAt = time.Now()
 	f.UpdatedAt = time.Now()
-	f.Version = 1
+	if f.Version == 0 {
+		f.Version = 1
+	}
+
+	f.Version++
 
 	return
 }

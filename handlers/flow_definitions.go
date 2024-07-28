@@ -101,6 +101,48 @@ func (h *FlowDefinitionHandler) CreateFlowDefinition(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+// Update a flow definition by its ID
+func (h *FlowDefinitionHandler) UpdateFlowDefinition(c *gin.Context) {
+	referenceId := c.Param("referenceId")
+	flowDefinition, err := h.findFlowDefinitionByReferenceID(referenceId)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			h.respondWithError(c, http.StatusNotFound, err)
+		} else {
+			h.respondWithError(c, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+	if err := c.ShouldBindJSON(&flowDefinition); err != nil {
+		h.respondWithError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	flowDefinition.ID = 0
+
+	if result := h.DB.Create(&flowDefinition); result.Error != nil {
+		h.respondWithError(c, http.StatusInternalServerError, result.Error)
+		return
+	}
+
+	response := FlowDefinitionResponse{
+		ID:           flowDefinition.ID,
+		ReferenceID:  flowDefinition.ReferenceID,
+		CreatedAt:    flowDefinition.CreatedAt,
+		UpdatedAt:    flowDefinition.UpdatedAt,
+		Name:         flowDefinition.Name,
+		Description:  flowDefinition.Description,
+		Status:       flowDefinition.Status,
+		Version:      flowDefinition.Version,
+		InputSchema:  flowDefinition.InputSchema,
+		OutputSchema: flowDefinition.OutputSchema,
+		Metadata:     flowDefinition.Metadata,
+	}
+
+	c.JSON(http.StatusCreated, response)
+}
+
 // Get a flow definition by its ID
 func (h *FlowDefinitionHandler) GetFlowDefinition(c *gin.Context) {
 	referenceId := c.Param("referenceId")
@@ -125,35 +167,6 @@ func (h *FlowDefinitionHandler) DeleteFlowDefinition(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusNoContent, nil)
-}
-
-// Update a flow definition by its ID
-func (h *FlowDefinitionHandler) UpdateFlowDefinition(c *gin.Context) {
-	referenceId := c.Param("referenceId")
-	flowDefinition, err := h.findFlowDefinitionByReferenceID(referenceId)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			h.respondWithError(c, http.StatusNotFound, err)
-		} else {
-			h.respondWithError(c, http.StatusInternalServerError, err)
-		}
-		return
-	}
-
-	if err := c.ShouldBindJSON(&flowDefinition); err != nil {
-		h.respondWithError(c, http.StatusBadRequest, err)
-		return
-	}
-
-	flowDefinition.Version++
-	flowDefinition.ID = 0
-
-	if result := h.DB.Create(&flowDefinition); result.Error != nil {
-		h.respondWithError(c, http.StatusInternalServerError, result.Error)
-		return
-	}
-
-	c.JSON(http.StatusOK, flowDefinition)
 }
 
 // handle the /schemas/flow_definitions/:referenceId/:type.json endpoint

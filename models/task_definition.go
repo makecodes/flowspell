@@ -16,7 +16,7 @@ type TaskDefinition struct {
 	Name             string    `json:"name"`
 	Description      string    `json:"description,omitempty"`
 	FlowDefinitionID int       `json:"flow_definition_id"`
-	FlowReferenceID  string    `json:"flow_reference_id"`
+	FlowDefinitionRefID  string    `json:"flow_definition_ref_id"`
 	ParentTaskID     *int      `json:"parent_task_id"`
 	InputSchema      JSONB     `json:"input_schema" gorm:"type:jsonb"`
 	OutputSchema     JSONB     `json:"output_schema" gorm:"type:jsonb"`
@@ -34,7 +34,7 @@ func (f *TaskDefinition) BeforeCreate(tx *gorm.DB) (err error) {
 	}
 
 	// Get FlowDefinition by reference_id the last version
-	flowDefinition, err := (&FlowDefinition{}).GetFlowDefinitionByReferenceID(tx, f.FlowReferenceID)
+	flowDefinition, err := (&FlowDefinition{}).GetFlowDefinitionByReferenceID(tx, f.FlowDefinitionRefID)
 	if err != nil {
 		return
 	}

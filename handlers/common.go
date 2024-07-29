@@ -35,7 +35,7 @@ type TaskDefinitionResponse struct {
 	ReferenceID  string       `json:"reference_id"`
 	Name         string       `json:"name"`
 	Description  string       `json:"description"`
-    FlowReferenceID string    `json:"flow_reference_id"`
+    FlowDefinitionRefID string    `json:"flow_definition_ref_id"`
     ParentTaskID int          `json:"parent_task_id"`
 	InputSchema  models.JSONB `json:"input_schema"`
 	OutputSchema models.JSONB `json:"output_schema"`
@@ -46,7 +46,7 @@ type TaskDefinitionResponse struct {
 type TaskDefinitionRequestBody struct {
     Name            string       `json:"name"`
     Description     *string       `json:"description"`
-    FlowReferenceID string    `json:"flow_reference_id"`
+    FlowDefinitionRefID string    `json:"flow_definition_ref_id"`
     ParentTaskID    *int          `json:"parent_task_id"`
     Input           models.JSONB `json:"input"`
     Output          models.JSONB `json:"output" gorm:"-"`

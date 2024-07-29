@@ -83,7 +83,7 @@ func (h *TaskDefinitionHandler) CreateTaskDefinition(c *gin.Context) {
 		ReferenceID:     taskDefinition.ReferenceID,
 		Name:            taskDefinition.Name,
 		Description:     taskDefinition.Description,
-        FlowReferenceID: taskDefinition.FlowReferenceID,
+        FlowDefinitionRefID: taskDefinition.FlowDefinitionRefID,
         ParentTaskID:    *taskDefinition.ParentTaskID,
 		InputSchema:     taskDefinition.InputSchema,
 		OutputSchema:    taskDefinition.OutputSchema,

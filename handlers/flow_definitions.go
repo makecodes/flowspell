@@ -93,7 +93,7 @@ func (h *FlowDefinitionHandler) CreateFlowDefinition(c *gin.Context) {
 
 // Update a flow definition by its ID
 func (h *FlowDefinitionHandler) UpdateFlowDefinition(c *gin.Context) {
-    referenceId := c.Param("referenceId")
+	referenceId := c.Param("referenceId")
 	flowDefinition, err := h.findFlowDefinitionByReferenceID(referenceId)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

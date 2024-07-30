@@ -18,7 +18,6 @@ func (h *TaskDefinitionHandler) respondWithError(c *gin.Context, status int, err
 	c.JSON(status, gin.H{"error": err.Error()})
 }
 
-
 // Return all task definitions
 func (h *TaskDefinitionHandler) GetTaskDefinitions(c *gin.Context) {
 	limit := 25
@@ -50,7 +49,6 @@ func (h *TaskDefinitionHandler) GetTaskDefinitions(c *gin.Context) {
 	c.JSON(http.StatusOK, taskDefinitions)
 }
 
-
 // Create a new task definition
 func (h *TaskDefinitionHandler) CreateTaskDefinition(c *gin.Context) {
 	var taskDefinition models.TaskDefinition
@@ -77,18 +75,20 @@ func (h *TaskDefinitionHandler) CreateTaskDefinition(c *gin.Context) {
 		return
 	}
 	response := TaskDefinitionResponse{
-		ID:              taskDefinition.ID,
-		CreatedAt:       taskDefinition.CreatedAt,
-		UpdatedAt:       taskDefinition.UpdatedAt,
-		ReferenceID:     taskDefinition.ReferenceID,
-		Name:            taskDefinition.Name,
-		Description:     taskDefinition.Description,
-        FlowDefinitionRefID: taskDefinition.FlowDefinitionRefID,
-        ParentTaskID:    *taskDefinition.ParentTaskID,
-		InputSchema:     taskDefinition.InputSchema,
-		OutputSchema:    taskDefinition.OutputSchema,
-		Version:         taskDefinition.Version,
-		Metadata:        taskDefinition.Metadata,
+		ID:                  taskDefinition.ID,
+		CreatedAt:           taskDefinition.CreatedAt,
+		UpdatedAt:           taskDefinition.UpdatedAt,
+		ReferenceID:         taskDefinition.ReferenceID,
+		Name:                taskDefinition.Name,
+		Description:         taskDefinition.Description,
+		FlowDefinitionRefID: taskDefinition.FlowDefinitionRefID,
+		InputSchema:         taskDefinition.InputSchema,
+		OutputSchema:        taskDefinition.OutputSchema,
+		Version:             taskDefinition.Version,
+		Metadata:            taskDefinition.Metadata,
+	}
+	if taskDefinition.ParentTaskID != nil {
+		response.ParentTaskID = *taskDefinition.ParentTaskID
 	}
 
 	c.JSON(http.StatusCreated, response)

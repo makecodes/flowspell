@@ -12,7 +12,7 @@ CREATE TABLE flow_definitions (
     input_schema JSONB,
     output_schema JSONB,
     metadata JSONB,
-    UNIQUE(reference_id, name, version)
+    UNIQUE(name, version)
 );
 
 CREATE TYPE flow_instances_status AS ENUM (
@@ -53,6 +53,7 @@ CREATE TABLE task_definitions (
     output_schema JSONB,
     version INTEGER NOT NULL DEFAULT 1,
     metadata JSONB,
+    UNIQUE(flow_definition_ref_id, name, version),
     CONSTRAINT fk_parent_task
         FOREIGN KEY(parent_task_id)
         REFERENCES task_definitions(id)

@@ -9,21 +9,21 @@ import (
 )
 
 type TaskDefinition struct {
-	ID               int       `json:"id" gorm:"primaryKey"`
-	CreatedAt        time.Time `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt        time.Time `json:"updated_at" gorm:"autoUpdateTime"`
-	ReferenceID      string    `json:"reference_id"`
-	Name             string    `json:"name"`
-	Description      string    `json:"description,omitempty"`
-	FlowDefinitionID int       `json:"flow_definition_id"`
-	FlowDefinitionRefID  string    `json:"flow_definition_ref_id"`
-	ParentTaskID     *int      `json:"parent_task_id"`
-	InputSchema      JSONB     `json:"input_schema" gorm:"type:jsonb"`
-	OutputSchema     JSONB     `json:"output_schema" gorm:"type:jsonb"`
-	Input            JSONB     `json:"input" gorm:"-"`
-	Output           JSONB     `json:"output" gorm:"-"`
-	Version          int       `json:"version" default:"1"`
-	Metadata         JSONB     `json:"metadata" gorm:"type:jsonb"`
+	ID                  int       `json:"id" gorm:"primaryKey"`
+	CreatedAt           time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt           time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	ReferenceID         string    `json:"reference_id"`
+	Name                string    `json:"name"`
+	Description         string    `json:"description,omitempty"`
+	FlowDefinitionID    int       `json:"flow_definition_id"`
+	FlowDefinitionRefID string    `json:"flow_definition_ref_id"`
+	ParentTaskID        *int      `json:"parent_task_id"`
+	InputSchema         JSONB     `json:"input_schema" gorm:"type:jsonb"`
+	OutputSchema        JSONB     `json:"output_schema" gorm:"type:jsonb"`
+	Input               JSONB     `json:"input" gorm:"-"`
+	Output              JSONB     `json:"output" gorm:"-"`
+	Version             int       `json:"version" default:"1"`
+	Metadata            JSONB     `json:"metadata" gorm:"type:jsonb"`
 }
 
 // BeforeCreate hook

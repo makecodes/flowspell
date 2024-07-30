@@ -16,8 +16,8 @@ type FlowInstance struct {
 	StartedAt           *time.Time `json:"started_at"`
 	EndedAt             *time.Time `json:"ended_at"`
 	ErrorAt             *time.Time `json:"error_at"`
-	FlowDefinitionID     *int       `json:"flow_definition_id"`
-	FlowDefinitionRefID  string     `json:"flow_definition_ref_id"`
+	FlowDefinitionID    *int       `json:"flow_definition_id"`
+	FlowDefinitionRefID string     `json:"flow_definition_ref_id"`
 	Status              string     `json:"status" gorm:"type:flow_instances_status" default:"waiting"`
 	InputData           JSONB      `json:"input_data" gorm:"type:jsonb"`
 	OutputData          JSONB      `json:"output_data" gorm:"type:jsonb"`
@@ -42,10 +42,10 @@ func (f *FlowInstance) BeforeCreate(tx *gorm.DB) (err error) {
 		return
 	}
 
-    if flowDefinition.Status == FlowDefinitionStatusInactive {
-        err = errors.New("flow definition is not active")
-        return
-    }
+	if flowDefinition.Status == FlowDefinitionStatusInactive {
+		err = errors.New("flow definition is not active")
+		return
+	}
 
 	if flowDefinition != nil && f.FlowDefinitionID == nil {
 		f.FlowDefinitionID = &flowDefinition.ID

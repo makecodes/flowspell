@@ -95,3 +95,9 @@ func (f *FlowDefinition) CountTaskDefinitionsByFlowDefinitionRefID(tx *gorm.DB) 
 
     return
 }
+
+func GetLastFlowDefinitionVersionFromReferenceID(tx *gorm.DB, referenceID string) (flowDefinition FlowDefinition, err error) {
+    err = tx.Where("reference_id = ?", referenceID).Order("version desc").First(&flowDefinition).Error
+
+    return
+}

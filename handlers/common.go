@@ -59,16 +59,6 @@ type FlowDefinitionRequestBody struct {
 	Output      models.JSONB `json:"output" gorm:"-"`
 }
 
-// Find a flow definition by its ID
-func (h *FlowDefinitionHandler) findFlowDefinitionByReferenceID(refrenceId string) (*models.FlowDefinition, error) {
-	var flowDefinition models.FlowDefinition
-	result := h.DB.Where("reference_id = ?", refrenceId).Order("version desc").First(&flowDefinition)
-	if result.Error != nil {
-		return nil, result.Error
-	}
-	return &flowDefinition, nil
-}
-
 // Find a task definition by its ID
 func (h *TaskDefinitionHandler) findTaskDefinitionByReferenceID(refrenceId string) (*models.TaskDefinition, error) {
 	var taskDefinition models.TaskDefinition

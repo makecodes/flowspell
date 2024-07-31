@@ -19,15 +19,6 @@ func (h *FlowInstanceHandler) respondWithError(c *gin.Context, status int, err e
 	c.JSON(status, gin.H{"error": err.Error()})
 }
 
-// Find a flow instance by its ID
-func (h *FlowInstanceHandler) findFlowDefinitionByID(id string) (*models.FlowInstance, error) {
-	var flowInstance models.FlowInstance
-	if result := h.DB.First(&flowInstance, id); result.Error != nil {
-		return nil, result.Error
-	}
-	return &flowInstance, nil
-}
-
 // Return all flow instances
 func (h *FlowInstanceHandler) GetFlowInstances(c *gin.Context) {
 	limit := 25
@@ -78,8 +69,9 @@ func (h *FlowInstanceHandler) StartFlow(c *gin.Context) {
 
     // Get the flow definition by reference ID
     var flowDefinition models.FlowDefinition
-    if result := h.DB.Where("reference_id = ?", referenceId).First(&flowDefinition); result.Error != nil {
-        h.respondWithError(c, http.StatusNotFound, result.Error)
+    flowDefinition, err := models.GetLastFlowDefinitionVersionFromReferenceID(h.DB, referenceId)
+    if err != nil {
+        h.respondWithError(c, http.StatusInternalServerError, err)
         return
     }
 

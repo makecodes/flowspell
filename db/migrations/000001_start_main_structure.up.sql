@@ -16,11 +16,11 @@ CREATE TABLE flow_definitions (
 );
 
 CREATE TYPE flow_instances_status AS ENUM (
+    'not_started',
     'waiting',
     'running',
     'completed',
     'failed',
-    'stopped'
 );
 CREATE TABLE flow_instances (
     id SERIAL PRIMARY KEY,
@@ -59,4 +59,29 @@ CREATE TABLE task_definitions (
         REFERENCES task_definitions(id)
 );
 
+
+CREATE TYPE task_instances_status AS ENUM (
+    'not_started',
+    'waiting',
+    'running',
+    'completed',
+    'failed',
+);
+CREATE TABLE task_instances (
+    id SERIAL PRIMARY KEY,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    started_at TIMESTAMP,
+    ended_at TIMESTAMP,
+    error_at TIMESTAMP,
+    task_definition_id INTEGER NOT NULL REFERENCES task_definitions(id),
+    task_definition_ref_id UUID NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    parent_task_id INTEGER,
+    version INTEGER NOT NULL DEFAULT 1,
+    input_data JSONB,
+    output_data JSONB,
+    metadata JSONB
+);
 COMMIT;

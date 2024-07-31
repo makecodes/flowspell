@@ -46,7 +46,13 @@ func (h *FlowDefinitionHandler) GetFlowDefinitions(c *gin.Context) {
 		h.respondWithError(c, http.StatusInternalServerError, result.Error)
 		return
 	}
-	c.JSON(http.StatusOK, flowDefinitions)
+
+    response := make([]FlowDefinitionResponse, len(flowDefinitions))
+    for i, fd := range flowDefinitions {
+        response[i] = serializeFlowDefinition(fd)
+    }
+
+	c.JSON(http.StatusOK, response)
 }
 
 // Create a new flow definition
@@ -74,19 +80,8 @@ func (h *FlowDefinitionHandler) CreateFlowDefinition(c *gin.Context) {
 		h.respondWithError(c, http.StatusInternalServerError, result.Error)
 		return
 	}
-	response := FlowDefinitionResponse{
-		ID:           flowDefinition.ID,
-		ReferenceID:  flowDefinition.ReferenceID,
-		CreatedAt:    flowDefinition.CreatedAt,
-		UpdatedAt:    flowDefinition.UpdatedAt,
-		Name:         flowDefinition.Name,
-		Description:  flowDefinition.Description,
-		Status:       flowDefinition.Status,
-		Version:      flowDefinition.Version,
-		InputSchema:  flowDefinition.InputSchema,
-		OutputSchema: flowDefinition.OutputSchema,
-		Metadata:     flowDefinition.Metadata,
-	}
+
+    response := serializeFlowDefinition(flowDefinition)
 
 	c.JSON(http.StatusCreated, response)
 }
@@ -116,19 +111,7 @@ func (h *FlowDefinitionHandler) UpdateFlowDefinition(c *gin.Context) {
 		return
 	}
 
-	response := FlowDefinitionResponse{
-		ID:           flowDefinition.ID,
-		ReferenceID:  flowDefinition.ReferenceID,
-		CreatedAt:    flowDefinition.CreatedAt,
-		UpdatedAt:    flowDefinition.UpdatedAt,
-		Name:         flowDefinition.Name,
-		Description:  flowDefinition.Description,
-		Status:       flowDefinition.Status,
-		Version:      flowDefinition.Version,
-		InputSchema:  flowDefinition.InputSchema,
-		OutputSchema: flowDefinition.OutputSchema,
-		Metadata:     flowDefinition.Metadata,
-	}
+    response := serializeFlowDefinition(*flowDefinition)
 
 	c.JSON(http.StatusCreated, response)
 }
@@ -145,6 +128,7 @@ func (h *FlowDefinitionHandler) GetFlowDefinition(c *gin.Context) {
 		}
 		return
 	}
+
 	c.JSON(http.StatusOK, flowDefinition)
 }
 

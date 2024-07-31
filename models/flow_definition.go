@@ -89,3 +89,9 @@ func (f *FlowDefinition) BeforeCreate(tx *gorm.DB) (err error) {
 
 	return
 }
+
+func (f *FlowDefinition) CountTaskDefinitionsByFlowDefinitionRefID(tx *gorm.DB) (count int64, err error) {
+    err = tx.Model(&TaskDefinition{}).Where("flow_definition_ref_id = ?", f.ReferenceID).Count(&count).Error
+
+    return
+}

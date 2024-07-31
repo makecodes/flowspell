@@ -72,25 +72,47 @@ func (h *FlowInstanceHandler) GetFlowInstances(c *gin.Context) {
 	c.JSON(http.StatusOK, flowInstances)
 }
 
-// // Create a new flow instance
-// func (h *FlowInstanceHandler) CreateFlowInstance(c *gin.Context) {
-// 	var flowInstance models.FlowInstance
-// 	if err := c.ShouldBindJSON(&flowInstance); err != nil {
-// 		h.respondWithError(c, http.StatusBadRequest, err)
-// 		return
-// 	}
-
-// 	if result := h.DB.Create(&flowInstance); result.Error != nil {
-// 		h.respondWithError(c, http.StatusInternalServerError, result.Error)
-// 		return
-// 	}
-// 	c.JSON(http.StatusCreated, flowInstance)
-// }
-
 // Start a flow instance
-func (h *FlowInstanceHandler) StartFlowInstance(c *gin.Context) {
+func (h *FlowInstanceHandler) StartFlow(c *gin.Context) {
 	referenceId := c.Param("referenceId")
 
+    // Get the flow definition by reference ID
+    var flowDefinition models.FlowDefinition
+    if result := h.DB.Where("reference_id = ?", referenceId).First(&flowDefinition); result.Error != nil {
+        h.respondWithError(c, http.StatusNotFound, result.Error)
+        return
+    }
+
+    // Verify if the flow definition is active
+    if flowDefinition.Status != models.FlowDefinitionStatusActive {
+        err := &CustomError{
+            Message: map[string]string{
+                "status": "Flow definition is not active",
+            },
+        }
+        h.respondWithError(c, http.StatusBadRequest, err)
+        return
+    }
+
+    // Verify if the flow definition has tasks
+    countTasks, err := flowDefinition.CountTaskDefinitionsByFlowDefinitionRefID(h.DB)
+    if err != nil {
+        h.respondWithError(c, http.StatusInternalServerError, err)
+        return
+    }
+
+    // If there are no tasks, return an error
+    if countTasks == 0 {
+        err := &CustomError{
+            Message: map[string]string{
+				"name": "Flow definition has no tasks",
+			},
+        }
+        h.respondWithError(c, http.StatusBadRequest, err)
+        return
+    }
+
+    // Create a new flow instance
 	var flowInstance models.FlowInstance
 	if err := c.ShouldBindJSON(&flowInstance); err != nil {
 		h.respondWithError(c, http.StatusBadRequest, err)

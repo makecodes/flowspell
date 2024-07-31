@@ -46,7 +46,16 @@ func (h *TaskDefinitionHandler) GetTaskDefinitions(c *gin.Context) {
 		h.respondWithError(c, http.StatusInternalServerError, result.Error)
 		return
 	}
-	c.JSON(http.StatusOK, taskDefinitions)
+
+    response := make([]TaskDefinitionResponse, len(taskDefinitions))
+    for i, td := range taskDefinitions {
+        response[i] = serializeTaskDefinition(td)
+        if td.ParentTaskID != nil {
+            response[i].ParentTaskID = *td.ParentTaskID
+        }
+    }
+
+	c.JSON(http.StatusOK, response)
 }
 
 // Create a new task definition
@@ -74,20 +83,9 @@ func (h *TaskDefinitionHandler) CreateTaskDefinition(c *gin.Context) {
 		h.respondWithError(c, http.StatusInternalServerError, result.Error)
 		return
 	}
-	response := TaskDefinitionResponse{
-		ID:                  taskDefinition.ID,
-		CreatedAt:           taskDefinition.CreatedAt,
-		UpdatedAt:           taskDefinition.UpdatedAt,
-		ReferenceID:         taskDefinition.ReferenceID,
-		Name:                taskDefinition.Name,
-		Description:         taskDefinition.Description,
-		FlowDefinitionRefID: taskDefinition.FlowDefinitionRefID,
-		InputSchema:         taskDefinition.InputSchema,
-		OutputSchema:        taskDefinition.OutputSchema,
-		Version:             taskDefinition.Version,
-		Metadata:            taskDefinition.Metadata,
-	}
-	if taskDefinition.ParentTaskID != nil {
+    response := serializeTaskDefinition(taskDefinition)
+
+    if taskDefinition.ParentTaskID != nil {
 		response.ParentTaskID = *taskDefinition.ParentTaskID
 	}
 

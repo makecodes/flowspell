@@ -48,7 +48,7 @@ func main() {
 		flowInstancesGroup := flowsGroup.Group("/instances")
 		{
 			flowInstancesGroup.GET("/", flowInstanceHandler.GetFlowInstances)
-			flowInstancesGroup.POST("/:referenceId/start", flowInstanceHandler.StartFlowInstance)
+			flowInstancesGroup.POST("/:referenceId/start", flowInstanceHandler.StartFlow)
 		}
 	}
 

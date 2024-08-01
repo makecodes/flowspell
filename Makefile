@@ -10,11 +10,11 @@ migration-down:
 
 migration-up:
 	@echo "Applying migration..."
-	@migrate -path db/migrations -database "${DATABASE_URL}" up
+	@migrate -path db/migrations -database "${DATABASE_URL}" up 2
 
 migration-up-test:
 	@echo "Applying migration..."
-	@migrate -path db/migrations -database "${DATABASE_TEST_URL}" up
+	@migrate -path db/migrations -database "${DATABASE_TEST_URL}" up 2
 
 test:
 	@echo "Running tests..."

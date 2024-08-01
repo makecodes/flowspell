@@ -1,3 +1,6 @@
+DROP TABLE task_instances;
+DROP TYPE task_instances_status;
+
 DROP TABLE task_definitions;
 
 DROP TABLE flow_instances;

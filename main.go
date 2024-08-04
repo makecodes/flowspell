@@ -7,8 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"flowspell/docs"
 )
@@ -65,6 +63,7 @@ func main() {
 		{
 			taskDefinitionsGroup.GET("/", taskDefinitionHandler.GetTaskDefinitions)
 			taskDefinitionsGroup.POST("/", taskDefinitionHandler.CreateTaskDefinition)
+            taskDefinitionsGroup.DELETE("/:referenceId", taskDefinitionHandler.DeleteTaskDefinition)
 		}
 	}
 
@@ -73,8 +72,9 @@ func main() {
 
 	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	url := ginSwagger.URL("http://localhost:8266/swagger/openapi.json")
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+    // flowSpellURL := os.Getenv("FLOWSPELL_HOST")
+    // url := ginSwagger.URL(flowSpellURL + "/swagger/openapi.json")
+	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	router.Run(":8266")
 }

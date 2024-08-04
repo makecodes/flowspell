@@ -91,3 +91,23 @@ func (h *TaskDefinitionHandler) CreateTaskDefinition(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, response)
 }
+
+
+// Delete a task definition
+func (h *TaskDefinitionHandler) DeleteTaskDefinition(c *gin.Context) {
+    referenceID := c.Param("referenceId")
+
+    var taskDefinition models.TaskDefinition
+    result := h.DB.Where("reference_id = ?", referenceID).First(&taskDefinition)
+    if result.Error != nil {
+        h.respondWithError(c, http.StatusNotFound, result.Error)
+        return
+    }
+
+    if result := h.DB.Delete(&taskDefinition); result.Error != nil {
+        h.respondWithError(c, http.StatusInternalServerError, result.Error)
+        return
+    }
+
+    c.JSON(http.StatusNoContent, nil)
+}

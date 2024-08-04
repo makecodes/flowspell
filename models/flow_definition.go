@@ -17,8 +17,8 @@ type FlowDefinition struct {
 	Description  string    `json:"description"`
 	Status       string    `json:"status" gorm:"type:flow_definition_status" default:"inactive"`
 	Version      int       `json:"version" default:"1"`
-	Input        JSONB     `json:"input" gorm:"-"`
-	Output       JSONB     `json:"output" gorm:"-"`
+	Input        JSONB     `json:"input,omitempty" gorm:"-"`
+	Output       JSONB     `json:"output,omitempty" gorm:"-"`
 	InputSchema  JSONB     `json:"input_schema" gorm:"type:jsonb"`
 	OutputSchema JSONB     `json:"output_schema" gorm:"type:jsonb"`
 	Metadata     JSONB     `json:"metadata" gorm:"type:jsonb"`
@@ -69,7 +69,7 @@ func (f *FlowDefinition) BeforeCreate(tx *gorm.DB) (err error) {
 	schemaDataOutput := SchemaData{
 		Host:        flowspellHost,
 		ReferenceID: f.ReferenceID,
-		Type:        "input",
+		Type:        "output",
 	}
 
 	completeOutputSchema, err := CompleteSchema(convertedOutput, schemaDataOutput)

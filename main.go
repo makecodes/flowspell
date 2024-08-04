@@ -13,6 +13,13 @@ import (
 	"flowspell/docs"
 )
 
+// @title FlowSpell API
+// @version 1.0
+// @description FlowSpell will handle the flows of your applications
+// @termsOfService https://flowspell.org/terms/
+
+// @host localhost:8266
+// @BasePath /
 func main() {
 	docs.SwaggerInfo.Title = "FlowSpell"
 	docs.SwaggerInfo.Description = "FlowSpell API"
@@ -30,7 +37,7 @@ func main() {
 
 	flowDefinitionHandler := handlers.FlowDefinitionHandler{DB: dbConnection}
 	flowInstanceHandler := handlers.FlowInstanceHandler{DB: dbConnection}
-    taskDefinitionHandler := handlers.TaskDefinitionHandler{DB: dbConnection}
+	taskDefinitionHandler := handlers.TaskDefinitionHandler{DB: dbConnection}
 
 	router := gin.Default()
 
@@ -52,18 +59,22 @@ func main() {
 		}
 	}
 
-    tasksGroup := router.Group("/tasks")
-    {
-        taskDefinitionsGroup := tasksGroup.Group("/definitions")
-        {
-            taskDefinitionsGroup.GET("/", taskDefinitionHandler.GetTaskDefinitions)
-            taskDefinitionsGroup.POST("/", taskDefinitionHandler.CreateTaskDefinition)
-        }
-    }
+	tasksGroup := router.Group("/tasks")
+	{
+		taskDefinitionsGroup := tasksGroup.Group("/definitions")
+		{
+			taskDefinitionsGroup.GET("/", taskDefinitionHandler.GetTaskDefinitions)
+			taskDefinitionsGroup.POST("/", taskDefinitionHandler.CreateTaskDefinition)
+		}
+	}
 
 	// JSONSchema
 	router.GET("/schemas/flow_definitions/:referenceId/:type", flowDefinitionHandler.GetFlowDefinitionSchema)
 
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	url := ginSwagger.URL("http://localhost:8266/swagger/openapi.json")
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
+
 	router.Run(":8266")
 }

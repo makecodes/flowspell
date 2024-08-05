@@ -12,3 +12,7 @@ faker = "*"
 
 [requires]
 python_version = "3.8"
+
+[scripts]
+populate = "python -m populate"
+shutdown = "python -m shutdown"

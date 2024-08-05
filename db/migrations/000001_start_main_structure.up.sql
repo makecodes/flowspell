@@ -49,6 +49,7 @@ CREATE TABLE task_definitions (
     name TEXT NOT NULL,
     description TEXT,
     parent_task_id INTEGER,
+    parent_task_def_ref_id UUID,
     input_schema JSONB,
     output_schema JSONB,
     version INTEGER NOT NULL DEFAULT 1,

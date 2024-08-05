@@ -18,10 +18,11 @@ type TaskDefinition struct {
 	FlowDefinitionID     int       `json:"flow_definition_id"`
 	FlowDefinitionRefID  string    `json:"flow_definition_ref_id"`
 	ParentTaskID        *int      `json:"parent_task_id"`
+    ParentTaskDefRefID  *int      `json:"parent_task_def_ref_id"`
 	InputSchema         JSONB     `json:"input_schema" gorm:"type:jsonb"`
 	OutputSchema        JSONB     `json:"output_schema" gorm:"type:jsonb"`
-	Input               JSONB     `json:"input" gorm:"-"`
-	Output              JSONB     `json:"output" gorm:"-"`
+	Input               JSONB     `json:"input,omitempty" gorm:"-"`
+	Output              JSONB     `json:"output,omitempty" gorm:"-"`
 	Version             int       `json:"version" default:"1"`
 	Metadata            JSONB     `json:"metadata" gorm:"type:jsonb"`
 }

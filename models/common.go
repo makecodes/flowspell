@@ -34,25 +34,24 @@ type SchemaData struct {
 
 // Constants
 const (
-    // FlowDefinition
+	// FlowDefinition
 	FlowDefinitionStatusActive   = "active"
 	FlowDefinitionStatusInactive = "inactive"
 
-    // FlowInstance
-    FlowInstanceStatusWaiting   = "waiting"
+	// FlowInstance
+	FlowInstanceStatusWaiting   = "waiting"
 	FlowInstanceStatusRunning   = "running"
 	FlowInstanceStatusCompleted = "completed"
 	FlowInstanceStatusFailed    = "failed"
 	FlowInstanceStatusStopped   = "stopped"
 
-    // TaskInstance
-    TaskInstanceStatusNotStarted = "not_started"
-    TaskInstanceWaiting          = "waiting"
-    TaskInstanceStatusRunning    = "running"
-    TaskInstanceStatusCompleted  = "completed"
-    TaskInstanceStatusFailed     = "failed"
+	// TaskInstance
+	TaskInstanceStatusNotStarted = "not_started"
+	TaskInstanceAcknowledged     = "acknowledged"
+	TaskInstanceStatusRunning    = "running"
+	TaskInstanceStatusCompleted  = "completed"
+	TaskInstanceStatusFailed     = "failed"
 )
-
 
 func CompleteSchema(simplified SimplifiedSchema, schemaData SchemaData) (map[string]interface{}, error) {
 	// Replace data

@@ -36,6 +36,7 @@ func main() {
 	flowDefinitionHandler := handlers.FlowDefinitionHandler{DB: dbConnection}
 	flowInstanceHandler := handlers.FlowInstanceHandler{DB: dbConnection}
 	taskDefinitionHandler := handlers.TaskDefinitionHandler{DB: dbConnection}
+	taskInstanceHandler := handlers.TaskInstanceHandler{DB: dbConnection}
 
 	router := gin.Default()
 
@@ -63,9 +64,11 @@ func main() {
 		{
 			taskDefinitionsGroup.GET("/", taskDefinitionHandler.GetTaskDefinitions)
 			taskDefinitionsGroup.POST("/", taskDefinitionHandler.CreateTaskDefinition)
-            taskDefinitionsGroup.GET("/:referenceId", taskDefinitionHandler.GetTaskDefinition)
-            taskDefinitionsGroup.DELETE("/:referenceId", taskDefinitionHandler.DeleteTaskDefinition)
+			taskDefinitionsGroup.GET("/:referenceId", taskDefinitionHandler.GetTaskDefinition)
+			taskDefinitionsGroup.DELETE("/:referenceId", taskDefinitionHandler.DeleteTaskDefinition)
 		}
+
+		tasksGroup.POST("/queue", taskInstanceHandler.GetTaskQueue)
 	}
 
 	// JSONSchema
@@ -73,8 +76,8 @@ func main() {
 
 	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-    // flowSpellURL := os.Getenv("FLOWSPELL_HOST")
-    // url := ginSwagger.URL(flowSpellURL + "/swagger/openapi.json")
+	// flowSpellURL := os.Getenv("FLOWSPELL_HOST")
+	// url := ginSwagger.URL(flowSpellURL + "/swagger/openapi.json")
 	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	router.Run(":8266")

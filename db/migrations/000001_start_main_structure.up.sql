@@ -65,7 +65,7 @@ CREATE TABLE task_definitions (
 
 CREATE TYPE task_instances_status AS ENUM (
     'not_started',
-    'waiting',
+    'acknowledged',
     'running',
     'completed',
     'failed'
@@ -74,9 +74,10 @@ CREATE TABLE task_instances (
     id SERIAL PRIMARY KEY,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    acknowledged_at TIMESTAMP,
     started_at TIMESTAMP,
-    ended_at TIMESTAMP,
-    error_at TIMESTAMP,
+    completed_at TIMESTAMP,
+    failed_at TIMESTAMP,
     flow_definition_id INTEGER NOT NULL REFERENCES flow_definitions(id),
     flow_definition_ref_id UUID NOT NULL,
     task_definition_id INTEGER NOT NULL REFERENCES task_definitions(id),

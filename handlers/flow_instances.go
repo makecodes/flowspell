@@ -69,64 +69,67 @@ func (h *FlowInstanceHandler) GetFlowInstances(c *gin.Context) {
 func (h *FlowInstanceHandler) StartFlow(c *gin.Context) {
 	referenceId := c.Param("referenceId")
 
-    // Get the flow definition by reference ID
-    var flowDefinition models.FlowDefinition
-    flowDefinition, err := models.GetLastFlowDefinitionVersionFromReferenceID(h.DB, referenceId)
-    if err != nil {
-        h.respondWithError(c, http.StatusInternalServerError, err)
-        return
-    }
+	// Get the flow definition by reference ID
+	var flowDefinition models.FlowDefinition
+	flowDefinition, err := models.GetLastFlowDefinitionVersionFromReferenceID(h.DB, referenceId)
+	if err != nil {
+		h.respondWithError(c, http.StatusInternalServerError, err)
+		return
+	}
 
-    // Verify if the flow definition is active
-    if flowDefinition.Status != models.FlowDefinitionStatusActive {
-        err := &CustomError{
-            Message: map[string]string{
-                "status": "Flow definition is not active",
-            },
-        }
-        h.respondWithError(c, http.StatusBadRequest, err)
-        return
-    }
+	// Verify if the flow definition is active
+	if flowDefinition.Status != models.FlowDefinitionStatusActive {
+		err := &CustomError{
+			Message: map[string]string{
+				"status": "Flow definition is not active",
+			},
+		}
+		h.respondWithError(c, http.StatusBadRequest, err)
+		return
+	}
 
-    // Retrieve all task definitions by flow definition reference ID
-    taskDefinitions, err := models.GetTaskDefinitionsByFlowDefinitionRefID(h.DB, referenceId)
-    if err != nil {
-        h.respondWithError(c, http.StatusInternalServerError, err)
-        return
-    }
+	// Retrieve all task definitions by flow definition reference ID
+	taskDefinitions, err := models.GetTaskDefinitionsByFlowDefinitionRefID(h.DB, referenceId)
+	if err != nil {
+		h.respondWithError(c, http.StatusInternalServerError, err)
+		return
+	}
 
-    // Verify if the flow definition has tasks
-    if len(taskDefinitions) == 0 {
-        err := &CustomError{
-            Message: map[string]string{
-                "name": "Flow definition has no tasks",
-            },
-        }
-        h.respondWithError(c, http.StatusBadRequest, err)
-        return
-    }
+	// Verify if the flow definition has tasks
+	if len(taskDefinitions) == 0 {
+		err := &CustomError{
+			Message: map[string]string{
+				"name": "Flow definition has no tasks",
+			},
+		}
+		h.respondWithError(c, http.StatusBadRequest, err)
+		return
+	}
 
-    // Create task instances with status not_started
-    for _, taskDefinition := range taskDefinitions {
-        var taskInstance models.TaskInstance
-        taskInstance.Name = taskDefinition.Name
-        taskInstance.TaskDefinitionID = taskDefinition.ID
-        taskInstance.TaskDefinitionRefID = taskDefinition.ReferenceID
-        taskInstance.FlowDefinitionID = flowDefinition.ID
-        taskInstance.FlowDefinitionRefID = flowDefinition.ReferenceID
-        taskInstance.Status = models.TaskInstanceStatusNotStarted
+	go func() {
 
-        if taskDefinition.ParentTaskID != nil {
-            taskInstance.ParentTaskID = taskDefinition.ParentTaskID
-        }
+		// Create task instances with status not_started
+		for _, taskDefinition := range taskDefinitions {
+			var taskInstance models.TaskInstance
+			taskInstance.Name = taskDefinition.Name
+			taskInstance.TaskDefinitionID = taskDefinition.ID
+			taskInstance.TaskDefinitionRefID = taskDefinition.ReferenceID
+			taskInstance.FlowDefinitionID = flowDefinition.ID
+			taskInstance.FlowDefinitionRefID = flowDefinition.ReferenceID
+			taskInstance.Status = models.TaskInstanceStatusNotStarted
 
-        if result := h.DB.Create(&taskInstance); result.Error != nil {
-            h.respondWithError(c, http.StatusInternalServerError, result.Error)
-            return
-        }
-    }
+			if taskDefinition.ParentTaskID != nil {
+				taskInstance.ParentTaskID = taskDefinition.ParentTaskID
+			}
 
-    // Create a new flow instance
+			if result := h.DB.Create(&taskInstance); result.Error != nil {
+				h.respondWithError(c, http.StatusInternalServerError, result.Error)
+				return
+			}
+		}
+	}()
+
+	// Create a new flow instance
 	var flowInstance models.FlowInstance
 	if err := c.ShouldBindJSON(&flowInstance); err != nil {
 		h.respondWithError(c, http.StatusBadRequest, err)
@@ -148,9 +151,9 @@ func (h *FlowInstanceHandler) StartFlow(c *gin.Context) {
 }
 
 func GetJSONFromRequestBody(body io.ReadCloser) (map[string]interface{}, error) {
-    var inputData map[string]interface{}
-    if err := json.NewDecoder(body).Decode(&inputData); err != nil {
-        return nil, err
-    }
-    return inputData, nil
+	var inputData map[string]interface{}
+	if err := json.NewDecoder(body).Decode(&inputData); err != nil {
+		return nil, err
+	}
+	return inputData, nil
 }

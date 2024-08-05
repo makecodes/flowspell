@@ -14,28 +14,37 @@ response_task_definitions = client().get("/tasks/definitions/")
 assert response_task_definitions.json() == []
 
 flow_definition_data = {
-    "name": "flow_1",
+    "name": "flow_collect_user_data",
     "input": {
         "properties": {
-            "firstName": {
-                "type": "string",
-                "description": "The person's first name.",
-            },
-            "lastName": {
-                "type": "string",
-                "description": "The person's last name.",
+            "id": {
+                "type": "integer",
+                "description": "The person's identifier.",
             },
         },
-        "required": ["firstName", "lastName"],
+        "required": ["id"],
     },
     "output": {
         "properties": {
-            "fullName": {
+            "id": {
+                "type": "integer",
+                "description": "The person's identifier.",
+            },
+            "firstName": {
                 "type": "string",
-                "description": "The person full name.",
-            }
+                "description": "The person first name.",
+            },
+            "lastName": {
+                "type": "string",
+                "description": "The person last name.",
+            },
+            "age": {
+                "description": "Age in years which must be equal to or greater than zero.",
+                "type": "integer",
+                "minimum": 0
+            },
         },
-        "required": ["fullName"],
+        "required": ["firstName", "lastName", "age", "id"],
     }
 }
 response_flow_definition = client().post("/flows/definitions/", json=flow_definition_data)
@@ -44,23 +53,22 @@ flow_definition_ref_id = response_flow_definition.json()["reference_id"]
 
 # 2. Creating task definitions
 task_definition_data = {
-    "name": "flow_1_task_1_add_age",
+    "name": "flow_1_task_1_add_name",
     "flow_definition_ref_id": flow_definition_ref_id,
+    "flow_definition_id": response_flow_definition.json()["id"],
     "input": {
-        "properties": {
-            "age": {
-                "description": "Age in years which must be equal to or greater than zero.",
-                "type": "integer",
-                "minimum": 0
-            }
-        },
-        "required": ["age"]
+        "properties": {},
+        "required": [],
     },
     "output": {
         "properties": {
-            "fullName": {
+            "firstName": {
                 "type": "string",
-                "description": "The person full name.",
+                "description": "The person first name.",
+            },
+            "lastName": {
+                "type": "string",
+                "description": "The person last name.",
             },
             "age": {
                 "description": "Age in years which must be equal to or greater than zero.",
@@ -68,41 +76,8 @@ task_definition_data = {
                 "minimum": 0
             },
         },
-        "required": ["description"]
+        "required": ["firstName", "lastName", "age"],
     }
 }
 response_task_definition = client().post("/tasks/definitions/", json=task_definition_data)
-task_definition_ref_id = response_task_definition.json()["reference_id"]
-print(json.dumps(response_task_definition.json(), indent=2))
-
-# 2.
-task_definition_data = {
-    "name": "flow_1_task_1_add_age",
-    "flow_definition_ref_id": flow_definition_ref_id,
-
-    "input": {
-        "properties": {
-            "age": {
-                "description": "Age in years which must be equal to or greater than zero.",
-                "type": "integer",
-                "minimum": 0
-            }
-        },
-        "required": ["age"]
-    },
-    "output": {
-        "properties": {
-            "fullName": {
-                "type": "string",
-                "description": "The person full name.",
-            },
-            "age": {
-                "description": "Age in years which must be equal to or greater than zero.",
-                "type": "integer",
-                "minimum": 0
-            },
-        },
-        "required": ["description"]
-    }
-}
-
+task_def_ref_id = response_task_definition.json()["reference_id"]

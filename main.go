@@ -63,6 +63,7 @@ func main() {
 		{
 			taskDefinitionsGroup.GET("/", taskDefinitionHandler.GetTaskDefinitions)
 			taskDefinitionsGroup.POST("/", taskDefinitionHandler.CreateTaskDefinition)
+            taskDefinitionsGroup.GET("/:referenceId", taskDefinitionHandler.GetTaskDefinition)
             taskDefinitionsGroup.DELETE("/:referenceId", taskDefinitionHandler.DeleteTaskDefinition)
 		}
 	}

@@ -86,6 +86,9 @@ func (h *FlowInstanceHandler) StartFlow(c *gin.Context) {
         return
     }
 
+    // Retrieve all task definitions by flow definition reference ID
+    // taskDefinitions, err := models.GetTaskDefinitionsByFlowDefinitionRefID(h.DB, referenceId)
+
     // Verify if the flow definition has tasks
     countTasks, err := flowDefinition.CountTaskDefinitionsByFlowDefinitionRefID(h.DB)
     if err != nil {

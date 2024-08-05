@@ -92,6 +92,21 @@ func (h *TaskDefinitionHandler) CreateTaskDefinition(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
+// Get a task definition by its ID
+func (h *TaskDefinitionHandler) GetTaskDefinition(c *gin.Context) {
+    referenceID := c.Param("referenceId")
+    taskDefinition, err := models.GetLastTaskDefinitionVersionFromReferenceID(h.DB, referenceID)
+    if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			h.respondWithError(c, http.StatusNotFound, err)
+		} else {
+			h.respondWithError(c, http.StatusInternalServerError, err)
+		}
+		return
+	}
+
+    c.JSON(http.StatusOK, taskDefinition)
+}
 
 // Delete a task definition
 func (h *TaskDefinitionHandler) DeleteTaskDefinition(c *gin.Context) {

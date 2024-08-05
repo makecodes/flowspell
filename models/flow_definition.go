@@ -13,6 +13,7 @@ type FlowDefinition struct {
 	ReferenceID  string    `json:"reference_id"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
+    IsLatest     bool      `json:"is_latest"`
 	Name         string    `json:"name"`
 	Description  string    `json:"description"`
 	Status       string    `json:"status" gorm:"type:flow_definition_status" default:"inactive"`
@@ -87,17 +88,30 @@ func (f *FlowDefinition) BeforeCreate(tx *gorm.DB) (err error) {
 
 	f.Version++
 
+    f.IsLatest = true
+
+    // Set all other versions to false
+    tx.Model(&FlowDefinition{}).Where("reference_id = ?", f.ReferenceID).Update("is_latest", false)
+
 	return
 }
 
 func (f *FlowDefinition) CountTaskDefinitionsByFlowDefinitionRefID(tx *gorm.DB) (count int64, err error) {
-    err = tx.Model(&TaskDefinition{}).Where("flow_definition_ref_id = ?", f.ReferenceID).Count(&count).Error
+    err = tx.
+        Model(&TaskDefinition{}).
+        Where("flow_definition_ref_id = ?", f.ReferenceID).
+        Where("is_latest = ?", true).
+        Count(&count).Error
 
     return
 }
 
 func GetLastFlowDefinitionVersionFromReferenceID(tx *gorm.DB, referenceID string) (flowDefinition FlowDefinition, err error) {
-    err = tx.Where("reference_id = ?", referenceID).Order("version desc").First(&flowDefinition).Error
+    err = tx.
+        Where("reference_id = ?", referenceID).
+        Order("version desc").
+        First(&flowDefinition).
+        Error
 
     return
 }

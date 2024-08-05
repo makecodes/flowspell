@@ -78,6 +78,7 @@ func (f *FlowInstance) BeforeCreate(tx *gorm.DB) (err error) {
 
 	result := schema.Validate(inputData)
 	if !result.IsValid() {
+        fmt.Println(result)
 		schemaUrl := flowDefinition.InputSchema["$id"]
 		err = errors.New("input data is not valid, refer to the schema: " + fmt.Sprintf("%v", schemaUrl))
 		return err

@@ -44,7 +44,15 @@ const (
 	FlowInstanceStatusCompleted = "completed"
 	FlowInstanceStatusFailed    = "failed"
 	FlowInstanceStatusStopped   = "stopped"
+
+    // TaskInstance
+    TaskInstanceStatusNotStarted = "not_started"
+    TaskInstanceWaiting          = "waiting"
+    TaskInstanceStatusRunning    = "running"
+    TaskInstanceStatusCompleted  = "completed"
+    TaskInstanceStatusFailed     = "failed"
 )
+
 
 func CompleteSchema(simplified SimplifiedSchema, schemaData SchemaData) (map[string]interface{}, error) {
 	// Replace data

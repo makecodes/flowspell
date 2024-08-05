@@ -15,6 +15,7 @@ assert response_task_definitions.json() == []
 
 flow_definition_data = {
     "name": "flow_collect_user_data",
+    "status": "active",
     "input": {
         "properties": {
             "id": {
@@ -81,3 +82,14 @@ task_definition_data = {
 }
 response_task_definition = client().post("/tasks/definitions/", json=task_definition_data)
 task_def_ref_id = response_task_definition.json()["reference_id"]
+
+# 3. Starting the flow
+flow_instance_data = {
+    "input_data": {
+        "id": 1,
+    },
+}
+
+response_flow_instance = client().post(f"/flows/instances/{flow_definition_ref_id}/start", json=flow_instance_data)
+print(json.dumps(response_flow_instance.json(), indent=2))
+assert response_flow_instance.status_code == 201

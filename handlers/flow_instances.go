@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"encoding/json"
 	"flowspell/models"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -87,24 +89,41 @@ func (h *FlowInstanceHandler) StartFlow(c *gin.Context) {
     }
 
     // Retrieve all task definitions by flow definition reference ID
-    // taskDefinitions, err := models.GetTaskDefinitionsByFlowDefinitionRefID(h.DB, referenceId)
-
-    // Verify if the flow definition has tasks
-    countTasks, err := flowDefinition.CountTaskDefinitionsByFlowDefinitionRefID(h.DB)
+    taskDefinitions, err := models.GetTaskDefinitionsByFlowDefinitionRefID(h.DB, referenceId)
     if err != nil {
         h.respondWithError(c, http.StatusInternalServerError, err)
         return
     }
 
-    // If there are no tasks, return an error
-    if countTasks == 0 {
+    // Verify if the flow definition has tasks
+    if len(taskDefinitions) == 0 {
         err := &CustomError{
             Message: map[string]string{
-				"name": "Flow definition has no tasks",
-			},
+                "name": "Flow definition has no tasks",
+            },
         }
         h.respondWithError(c, http.StatusBadRequest, err)
         return
+    }
+
+    // Create task instances with status not_started
+    for _, taskDefinition := range taskDefinitions {
+        var taskInstance models.TaskInstance
+        taskInstance.Name = taskDefinition.Name
+        taskInstance.TaskDefinitionID = taskDefinition.ID
+        taskInstance.TaskDefinitionRefID = taskDefinition.ReferenceID
+        taskInstance.FlowDefinitionID = flowDefinition.ID
+        taskInstance.FlowDefinitionRefID = flowDefinition.ReferenceID
+        taskInstance.Status = models.TaskInstanceStatusNotStarted
+
+        if taskDefinition.ParentTaskID != nil {
+            taskInstance.ParentTaskID = taskDefinition.ParentTaskID
+        }
+
+        if result := h.DB.Create(&taskInstance); result.Error != nil {
+            h.respondWithError(c, http.StatusInternalServerError, result.Error)
+            return
+        }
     }
 
     // Create a new flow instance
@@ -117,6 +136,7 @@ func (h *FlowInstanceHandler) StartFlow(c *gin.Context) {
 	flowInstance.FlowDefinitionRefID = referenceId
 
 	now := time.Now()
+
 	flowInstance.StartedAt = &now
 	flowInstance.Status = models.FlowInstanceStatusRunning
 
@@ -125,4 +145,12 @@ func (h *FlowInstanceHandler) StartFlow(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, flowInstance)
+}
+
+func GetJSONFromRequestBody(body io.ReadCloser) (map[string]interface{}, error) {
+    var inputData map[string]interface{}
+    if err := json.NewDecoder(body).Decode(&inputData); err != nil {
+        return nil, err
+    }
+    return inputData, nil
 }

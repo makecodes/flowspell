@@ -115,3 +115,13 @@ func GetLastFlowDefinitionVersionFromReferenceID(tx *gorm.DB, referenceID string
 
     return
 }
+
+func GetTaskDefinitionsByFlowDefinitionRefID(tx *gorm.DB, referenceID string) (taskDefinitions []TaskDefinition, err error) {
+    err = tx.
+        Where("flow_definition_ref_id = ?", referenceID).
+        Where("is_latest = ?", true).
+        Find(&taskDefinitions).
+        Error
+
+    return
+}

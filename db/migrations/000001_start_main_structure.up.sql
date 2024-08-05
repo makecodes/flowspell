@@ -77,6 +77,8 @@ CREATE TABLE task_instances (
     started_at TIMESTAMP,
     ended_at TIMESTAMP,
     error_at TIMESTAMP,
+    flow_definition_id INTEGER NOT NULL REFERENCES flow_definitions(id),
+    flow_definition_ref_id UUID NOT NULL,
     task_definition_id INTEGER NOT NULL REFERENCES task_definitions(id),
     task_definition_ref_id UUID NOT NULL,
     name TEXT NOT NULL,

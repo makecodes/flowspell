@@ -93,9 +93,12 @@ func (f *TaskDefinition) BeforeCreate(tx *gorm.DB) (err error) {
 	}
 
 	f.Version++
+    f.IsLatest = true
 
     // Set all other versions to false
-    tx.Model(&TaskDefinition{}).Where("reference_id = ?", f.ReferenceID).Update("is_latest", false)
+    tx.Model(&TaskDefinition{}).
+        Where("reference_id = ?", f.ReferenceID).
+        Update("is_latest", false)
 
 	return
 }

@@ -2,7 +2,7 @@ import json
 
 from utils import client
 
-pre_create = False
+pre_create = True
 if pre_create:
     # 1. Garantindo que o sistema está limpo
     response_flow_definitions = client().get("/flows/definitions/")

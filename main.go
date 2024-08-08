@@ -1,84 +1,52 @@
 package main
 
 import (
-	"flowspell/db"
-	"flowspell/handlers"
-	"log"
+	"os"
 
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"flowspell/docs"
+	"flowspell/server"
+	"flowspell/worker"
+
+	"github.com/urfave/cli"
 )
 
-// @title FlowSpell API
-// @version 1.0
-// @description FlowSpell will handle the flows of your applications
-// @termsOfService https://flowspell.org/terms/
+var (
+	app *cli.App
+)
 
-// @host localhost:8266
-// @BasePath /
+func init() {
+	// Initialise a CLI app
+	app = cli.NewApp()
+	app.Name = "FlowSpell"
+	app.Usage = "FlowSpell is a magical tool to handle the flows of your applications"
+	app.Version = "1.0.0"
+}
+
+
 func main() {
-	docs.SwaggerInfo.Title = "FlowSpell"
-	docs.SwaggerInfo.Description = "FlowSpell API"
-	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = "http://localhost:8266"
-	docs.SwaggerInfo.BasePath = ""
-	docs.SwaggerInfo.Schemes = []string{"http"}
+    godotenv.Load()
 
-	godotenv.Load()
+    // Set the CLI app commands
+    app.Commands = []cli.Command{
+        {
+            Name: "worker",
+            Usage: "Start FlowSpell worker",
+            Action: func(c *cli.Context) error {
+                worker.Worker()
+                return nil
+            },
+        },
+        {
+			Name: "server",
+			Usage: "Start FlowSpell server",
+			Action: func(c *cli.Context) error {
+				server.FlowSpellServer()
+                return nil
+			},
+		},
+    }
 
-	dbConnection, err := db.GetDBConnection()
-	if err != nil {
-		log.Fatalf("Error connecting to database")
-	}
-
-	flowDefinitionHandler := handlers.FlowDefinitionHandler{DB: dbConnection}
-	flowInstanceHandler := handlers.FlowInstanceHandler{DB: dbConnection}
-	taskDefinitionHandler := handlers.TaskDefinitionHandler{DB: dbConnection}
-	taskInstanceHandler := handlers.TaskInstanceHandler{DB: dbConnection}
-
-	router := gin.Default()
-
-	flowsGroup := router.Group("/flows")
-	{
-		flowDefinitionsGroup := flowsGroup.Group("/definitions")
-		{
-			flowDefinitionsGroup.GET("/", flowDefinitionHandler.GetFlowDefinitions)
-			flowDefinitionsGroup.POST("/", flowDefinitionHandler.CreateFlowDefinition)
-			flowDefinitionsGroup.GET("/:referenceId", flowDefinitionHandler.GetFlowDefinition)
-			flowDefinitionsGroup.PUT("/:referenceId", flowDefinitionHandler.UpdateFlowDefinition)
-			flowDefinitionsGroup.DELETE("/:referenceId", flowDefinitionHandler.DeleteFlowDefinition)
-		}
-
-		flowInstancesGroup := flowsGroup.Group("/instances")
-		{
-			flowInstancesGroup.GET("/", flowInstanceHandler.GetFlowInstances)
-			flowInstancesGroup.POST("/:referenceId/start", flowInstanceHandler.StartFlow)
-		}
-	}
-
-	tasksGroup := router.Group("/tasks")
-	{
-		taskDefinitionsGroup := tasksGroup.Group("/definitions")
-		{
-			taskDefinitionsGroup.GET("/", taskDefinitionHandler.GetTaskDefinitions)
-			taskDefinitionsGroup.POST("/", taskDefinitionHandler.CreateTaskDefinition)
-			taskDefinitionsGroup.GET("/:referenceId", taskDefinitionHandler.GetTaskDefinition)
-			taskDefinitionsGroup.DELETE("/:referenceId", taskDefinitionHandler.DeleteTaskDefinition)
-		}
-
-		tasksGroup.POST("/queue", taskInstanceHandler.GetTaskQueue)
-	}
-
-	// JSONSchema
-	router.GET("/schemas/flow_definitions/:referenceId/:type", flowDefinitionHandler.GetFlowDefinitionSchema)
-
-	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	// flowSpellURL := os.Getenv("FLOWSPELL_HOST")
-	// url := ginSwagger.URL(flowSpellURL + "/swagger/openapi.json")
-	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
-
-	router.Run(":8266")
+    // Run the CLI app
+	_ = app.Run(os.Args)
 }

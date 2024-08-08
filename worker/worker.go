@@ -20,10 +20,10 @@ func init() {
 }
 
 func startServer() (*machinery.Server, error) {
-    brokerUrl := os.Getenv("BROKER_URL")
-    defaultQueue := os.Getenv("DEFAULT_QUEUE")
-    defaultExchange := os.Getenv("DEFAULT_EXCHANGE")
-    defaultBindingKey := os.Getenv("DEFAULT_BINDING_KEY")
+	brokerUrl := os.Getenv("BROKER_URL")
+	defaultQueue := os.Getenv("DEFAULT_QUEUE")
+	defaultExchange := os.Getenv("DEFAULT_EXCHANGE")
+	defaultBindingKey := os.Getenv("DEFAULT_BINDING_KEY")
 	cnf := &config.Config{
 		Broker:          brokerUrl,
 		DefaultQueue:    defaultQueue,
@@ -45,7 +45,7 @@ func startServer() (*machinery.Server, error) {
 
 	// Register tasks
 	tasksMap := map[string]interface{}{
-		"queue":               fsTasks.Queue,
+		"queue": fsTasks.Queue,
 	}
 
 	return server, server.RegisterTasks(tasksMap)

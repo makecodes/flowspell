@@ -2,6 +2,8 @@ package models
 
 import (
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type TaskInstance struct {
@@ -22,4 +24,15 @@ type TaskInstance struct {
 	InputData           JSONB      `json:"input_data" gorm:"type:jsonb"`
 	OutputData          JSONB      `json:"output_data" gorm:"type:jsonb"`
 	Metadata            JSONB      `json:"metadata" gorm:"type:jsonb"`
+}
+
+
+func GetAcknowledgedTasks(tx *gorm.DB) ([]TaskInstance, error) {
+    var taskInstances []TaskInstance
+    err := tx.
+        Where("status = ? AND acknowledged_at < ?", TaskInstanceAcknowledged, time.Now().
+        Add(-5*time.Minute)).
+        Find(&taskInstances).
+        Error
+    return taskInstances, err
 }

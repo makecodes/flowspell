@@ -21,15 +21,13 @@ func (h *TaskInstanceHandler) QueueCleanup() {
 	var tasks []models.TaskInstance
 	err := h.DB.
 		Where("status = ? AND acknowledged_at < ?", models.TaskInstanceAcknowledged, time.Now().
-			Add(-5*time.Minute)).
+			Add(-1*time.Minute)).
 		Find(&tasks).
 		Error
 
 	if err != nil {
 		return
 	}
-
-	fmt.Println("tasks", tasks)
 
 	for _, task := range tasks {
 		// Each task with status "acknowledged" will be cleaned up status TaskInstanceStatusNotStarted
@@ -38,7 +36,6 @@ func (h *TaskInstanceHandler) QueueCleanup() {
 			return
 		}
 
-		fmt.Println("Cleaning up task", task.ID)
+		fmt.Println("Cleaning up task", task.ID, task.Name)
 	}
-	fmt.Println("QueueCleanup")
 }

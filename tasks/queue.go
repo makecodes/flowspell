@@ -3,6 +3,7 @@ package tasks
 import (
 	"flowspell/models"
 	"fmt"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -11,20 +12,33 @@ type TaskInstanceHandler struct {
 	DB *gorm.DB
 }
 
-func Queue() error {
-	fmt.Println("Queueing tasks")
+func EnqueueTask() error {
+	fmt.Println("EnqueueTask")
 	return nil
 }
 
-func QueueCleanup() error {
-	h := TaskInstanceHandler{}
-	tasks, err := models.GetAcknowledgedTasks(h.DB)
+func (h *TaskInstanceHandler) QueueCleanup() {
+	var tasks []models.TaskInstance
+	err := h.DB.
+		Where("status = ? AND acknowledged_at < ?", models.TaskInstanceAcknowledged, time.Now().
+			Add(-5*time.Minute)).
+		Find(&tasks).
+		Error
+
 	if err != nil {
-		return err
+		return
 	}
 
+	fmt.Println("tasks", tasks)
+
 	for _, task := range tasks {
+		// Each task with status "acknowledged" will be cleaned up status TaskInstanceStatusNotStarted
+		task.Status = models.TaskInstanceStatusNotStarted
+		if err := h.DB.Save(&task).Error; err != nil {
+			return
+		}
+
 		fmt.Println("Cleaning up task", task.ID)
 	}
-	return nil
+	fmt.Println("QueueCleanup")
 }

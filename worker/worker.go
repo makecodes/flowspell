@@ -45,7 +45,7 @@ func startServer() (*machinery.Server, error) {
 
 	// Register tasks
 	tasksMap := map[string]interface{}{
-		"queue": fsTasks.Queue,
+		"queue": fsTasks.EnqueueTask,
 	}
 
 	return server, server.RegisterTasks(tasksMap)

@@ -47,10 +47,10 @@ func (h *FlowDefinitionHandler) GetFlowDefinitions(c *gin.Context) {
 		return
 	}
 
-    response := make([]FlowDefinitionResponse, len(flowDefinitions))
-    for i, fd := range flowDefinitions {
-        response[i] = serializeFlowDefinition(fd)
-    }
+	response := make([]FlowDefinitionResponse, len(flowDefinitions))
+	for i, fd := range flowDefinitions {
+		response[i] = serializeFlowDefinition(fd)
+	}
 
 	c.JSON(http.StatusOK, response)
 }
@@ -81,7 +81,7 @@ func (h *FlowDefinitionHandler) CreateFlowDefinition(c *gin.Context) {
 		return
 	}
 
-    response := serializeFlowDefinition(flowDefinition)
+	response := serializeFlowDefinition(flowDefinition)
 
 	c.JSON(http.StatusCreated, response)
 }
@@ -111,7 +111,7 @@ func (h *FlowDefinitionHandler) UpdateFlowDefinition(c *gin.Context) {
 		return
 	}
 
-    response := serializeFlowDefinition(flowDefinition)
+	response := serializeFlowDefinition(flowDefinition)
 
 	c.JSON(http.StatusCreated, response)
 }

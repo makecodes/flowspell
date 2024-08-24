@@ -26,13 +26,16 @@ type TaskInstance struct {
 	Metadata            JSONB      `json:"metadata" gorm:"type:jsonb"`
 }
 
+type TaskInstanceHandler struct {
+	DB *gorm.DB
+}
 
 func GetAcknowledgedTasks(tx *gorm.DB) ([]TaskInstance, error) {
-    var taskInstances []TaskInstance
-    err := tx.
-        Where("status = ? AND acknowledged_at < ?", TaskInstanceAcknowledged, time.Now().
-        Add(-5*time.Minute)).
-        Find(&taskInstances).
-        Error
-    return taskInstances, err
+	var taskInstances []TaskInstance
+	err := tx.
+		Where("status = ? AND acknowledged_at < ?", TaskInstanceAcknowledged, time.Now().
+			Add(-5*time.Minute)).
+		Find(&taskInstances).
+		Error
+	return taskInstances, err
 }

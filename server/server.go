@@ -8,13 +8,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const referenceIdPath = "/:referenceId"
+
 func FlowSpellServer() {
-    dbConnection, err := db.GetDBConnection()
+	dbConnection, err := db.GetDBConnection()
 	if err != nil {
 		log.Fatalf("Error connecting to database")
 	}
 
-    flowDefinitionHandler := handlers.FlowDefinitionHandler{DB: dbConnection}
+	flowDefinitionHandler := handlers.FlowDefinitionHandler{DB: dbConnection}
 	flowInstanceHandler := handlers.FlowInstanceHandler{DB: dbConnection}
 	taskDefinitionHandler := handlers.TaskDefinitionHandler{DB: dbConnection}
 	taskInstanceHandler := handlers.TaskInstanceHandler{DB: dbConnection}
@@ -27,9 +29,9 @@ func FlowSpellServer() {
 		{
 			flowDefinitionsGroup.GET("/", flowDefinitionHandler.GetFlowDefinitions)
 			flowDefinitionsGroup.POST("/", flowDefinitionHandler.CreateFlowDefinition)
-			flowDefinitionsGroup.GET("/:referenceId", flowDefinitionHandler.GetFlowDefinition)
-			flowDefinitionsGroup.PUT("/:referenceId", flowDefinitionHandler.UpdateFlowDefinition)
-			flowDefinitionsGroup.DELETE("/:referenceId", flowDefinitionHandler.DeleteFlowDefinition)
+			flowDefinitionsGroup.GET(referenceIdPath, flowDefinitionHandler.GetFlowDefinition)
+			flowDefinitionsGroup.PUT(referenceIdPath, flowDefinitionHandler.UpdateFlowDefinition)
+			flowDefinitionsGroup.DELETE(referenceIdPath, flowDefinitionHandler.DeleteFlowDefinition)
 		}
 
 		flowInstancesGroup := flowsGroup.Group("/instances")
@@ -45,8 +47,8 @@ func FlowSpellServer() {
 		{
 			taskDefinitionsGroup.GET("/", taskDefinitionHandler.GetTaskDefinitions)
 			taskDefinitionsGroup.POST("/", taskDefinitionHandler.CreateTaskDefinition)
-			taskDefinitionsGroup.GET("/:referenceId", taskDefinitionHandler.GetTaskDefinition)
-			taskDefinitionsGroup.DELETE("/:referenceId", taskDefinitionHandler.DeleteTaskDefinition)
+			taskDefinitionsGroup.GET(referenceIdPath, taskDefinitionHandler.GetTaskDefinition)
+			taskDefinitionsGroup.DELETE(referenceIdPath, taskDefinitionHandler.DeleteTaskDefinition)
 		}
 
 		tasksGroup.POST("/queue", taskInstanceHandler.GetTaskQueue)

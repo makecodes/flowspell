@@ -16,6 +16,8 @@ migration-up-test:
 	@echo "Applying migration..."
 	@migrate -path db/migrations -database "${DATABASE_TEST_URL}" up
 
+reset: migration-down migration-up
+
 test:
 	@echo "Running tests..."
 	@ENV=test go test ./...

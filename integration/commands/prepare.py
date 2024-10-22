@@ -2,6 +2,8 @@
 This script is used to populate the system with data for testing purposes.
 It is used to create flow definitions, task definitions, and start a flow instance.
 """
+import json
+
 from utils import client
 
 
@@ -88,3 +90,5 @@ if pre_create:
     task_def_ref_id = response_task_definition.json()["reference_id"]
 
     print("Task definition created: ", response_task_definition.json())
+    with open("task_definition.json", "w") as f:
+        f.write(json.dumps(response_task_definition.json(), indent=4))

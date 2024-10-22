@@ -1,3 +1,7 @@
+"""
+This script is used to populate the system with data for testing purposes.
+It is used to create flow definitions, task definitions, and start a flow instance.
+"""
 from utils import client
 
 
@@ -83,17 +87,4 @@ if pre_create:
     response_task_definition = client().post("/tasks/definitions/", json=task_definition_data)
     task_def_ref_id = response_task_definition.json()["reference_id"]
 
-    # 3. Starting the flow
-    flow_instance_data = {
-        "input_data": {
-            "id": 1,
-        },
-    }
-
-    response_flow_instance = client().post(f"/flows/instances/{flow_definition_ref_id}/start", json=flow_instance_data)
-    assert response_flow_instance.status_code == 201
-
-
-queue_data = {}
-queue_response = client().post("/tasks/queue", json=queue_data)
-print(queue_response.json())
+    print("Task definition created: ", response_task_definition.json())

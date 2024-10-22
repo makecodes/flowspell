@@ -1,10 +1,11 @@
-populate:
-	@uv run python -m commands.populate
+prepare:
+	@uv run python -m commands.prepare
 
-
-shutdown:
-	@uv run python -m commands.shutdown
-
+start:
+	@uv run python -m commands.start
 
 queue:
 	@uv run python -m commands.queue
+
+shutdown:
+	@uv run python -m commands.shutdown

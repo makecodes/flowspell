@@ -57,11 +57,5 @@ func FlowSpellServer() {
 	// JSONSchema
 	router.GET("/schemas/flow_definitions/:referenceId/:type", flowDefinitionHandler.GetFlowDefinitionSchema)
 
-	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	// flowSpellURL := os.Getenv("FLOWSPELL_HOST")
-	// url := ginSwagger.URL(flowSpellURL + "/swagger/openapi.json")
-	// router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
-
 	router.Run(":8266")
 }

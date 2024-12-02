@@ -15,7 +15,10 @@ import (
 var db *sql.DB
 
 func init() {
-	godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		return
+	}
 }
 
 func GetDatabaseConnectionString() string {

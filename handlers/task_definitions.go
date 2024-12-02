@@ -18,7 +18,7 @@ func (h *TaskDefinitionHandler) respondWithError(c *gin.Context, status int, err
 	c.JSON(status, gin.H{"error": err.Error()})
 }
 
-// Return all task definitions
+// GetTaskDefinitions Return all task definitions
 func (h *TaskDefinitionHandler) GetTaskDefinitions(c *gin.Context) {
 	limit := 25
 	offset := 0
@@ -47,18 +47,18 @@ func (h *TaskDefinitionHandler) GetTaskDefinitions(c *gin.Context) {
 		return
 	}
 
-    response := make([]TaskDefinitionResponse, len(taskDefinitions))
-    for i, td := range taskDefinitions {
-        response[i] = serializeTaskDefinition(td)
-        if td.ParentTaskID != nil {
-            response[i].ParentTaskID = *td.ParentTaskID
-        }
-    }
+	response := make([]TaskDefinitionResponse, len(taskDefinitions))
+	for i, td := range taskDefinitions {
+		response[i] = serializeTaskDefinition(td)
+		if td.ParentTaskID != nil {
+			response[i].ParentTaskID = *td.ParentTaskID
+		}
+	}
 
 	c.JSON(http.StatusOK, response)
 }
 
-// Create a new task definition
+// CreateTaskDefinition Create a new task definition
 func (h *TaskDefinitionHandler) CreateTaskDefinition(c *gin.Context) {
 	var taskDefinition models.TaskDefinition
 	if err := c.ShouldBindJSON(&taskDefinition); err != nil {
@@ -83,21 +83,21 @@ func (h *TaskDefinitionHandler) CreateTaskDefinition(c *gin.Context) {
 		h.respondWithError(c, http.StatusInternalServerError, result.Error)
 		return
 	}
-    response := serializeTaskDefinition(taskDefinition)
+	response := serializeTaskDefinition(taskDefinition)
 
-    if taskDefinition.ParentTaskID != nil {
+	if taskDefinition.ParentTaskID != nil {
 		response.ParentTaskID = *taskDefinition.ParentTaskID
 	}
 
 	c.JSON(http.StatusCreated, response)
 }
 
-// Get a task definition by its ID
+// GetTaskDefinition Get a task definition by its ID
 func (h *TaskDefinitionHandler) GetTaskDefinition(c *gin.Context) {
-    referenceID := c.Param("referenceId")
-    taskDefinition, err := models.GetLastTaskDefinitionVersionFromReferenceID(h.DB, referenceID)
-    if err != nil {
-		if err == gorm.ErrRecordNotFound {
+	referenceID := c.Param("referenceId")
+	taskDefinition, err := models.GetLastTaskDefinitionVersionFromReferenceID(h.DB, referenceID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			h.respondWithError(c, http.StatusNotFound, err)
 		} else {
 			h.respondWithError(c, http.StatusInternalServerError, err)
@@ -105,24 +105,24 @@ func (h *TaskDefinitionHandler) GetTaskDefinition(c *gin.Context) {
 		return
 	}
 
-    c.JSON(http.StatusOK, taskDefinition)
+	c.JSON(http.StatusOK, taskDefinition)
 }
 
-// Delete a task definition
+// DeleteTaskDefinition Delete a task definition
 func (h *TaskDefinitionHandler) DeleteTaskDefinition(c *gin.Context) {
-    referenceID := c.Param("referenceId")
+	referenceID := c.Param("referenceId")
 
-    var taskDefinition models.TaskDefinition
-    result := h.DB.Where("reference_id = ?", referenceID).First(&taskDefinition)
-    if result.Error != nil {
-        h.respondWithError(c, http.StatusNotFound, result.Error)
-        return
-    }
+	var taskDefinition models.TaskDefinition
+	result := h.DB.Where("reference_id = ?", referenceID).First(&taskDefinition)
+	if result.Error != nil {
+		h.respondWithError(c, http.StatusNotFound, result.Error)
+		return
+	}
 
-    if result := h.DB.Delete(&taskDefinition); result.Error != nil {
-        h.respondWithError(c, http.StatusInternalServerError, result.Error)
-        return
-    }
+	if result := h.DB.Delete(&taskDefinition); result.Error != nil {
+		h.respondWithError(c, http.StatusInternalServerError, result.Error)
+		return
+	}
 
-    c.JSON(http.StatusNoContent, nil)
+	c.JSON(http.StatusNoContent, nil)
 }

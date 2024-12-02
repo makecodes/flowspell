@@ -57,5 +57,8 @@ func FlowSpellServer() {
 	// JSONSchema
 	router.GET("/schemas/flow_definitions/:referenceId/:type", flowDefinitionHandler.GetFlowDefinitionSchema)
 
-	router.Run(":8266")
+	err = router.Run(":8266")
+	if err != nil {
+		return
+	}
 }

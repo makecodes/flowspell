@@ -21,7 +21,7 @@ func (h *FlowInstanceHandler) respondWithError(c *gin.Context, status int, err e
 	c.JSON(status, gin.H{"error": err.Error()})
 }
 
-// Return all flow instances
+// GetFlowInstances Return all flow instances
 func (h *FlowInstanceHandler) GetFlowInstances(c *gin.Context) {
 	limit := 25
 	offset := 0
@@ -65,7 +65,7 @@ func (h *FlowInstanceHandler) GetFlowInstances(c *gin.Context) {
 	c.JSON(http.StatusOK, flowInstances)
 }
 
-// Start a flow instance
+// StartFlow Start a flow instance
 func (h *FlowInstanceHandler) StartFlow(c *gin.Context) {
 	referenceId := c.Param("referenceId")
 

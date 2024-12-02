@@ -34,18 +34,18 @@ type SchemaData struct {
 
 // Constants
 const (
-	// FlowDefinition
+	// FlowDefinitionStatusActive FlowDefinition
 	FlowDefinitionStatusActive   = "active"
 	FlowDefinitionStatusInactive = "inactive"
 
-	// FlowInstance
+	// FlowInstanceStatusWaiting FlowInstance
 	FlowInstanceStatusWaiting   = "waiting"
 	FlowInstanceStatusRunning   = "running"
 	FlowInstanceStatusCompleted = "completed"
 	FlowInstanceStatusFailed    = "failed"
 	FlowInstanceStatusStopped   = "stopped"
 
-	// TaskInstance
+	// TaskInstanceStatusNotStarted TaskInstance
 	TaskInstanceStatusNotStarted = "not_started"
 	TaskInstanceAcknowledged     = "acknowledged"
 	TaskInstanceStatusRunning    = "running"
@@ -93,14 +93,14 @@ func (j JSONB) Value() (driver.Value, error) {
 }
 
 func (j *JSONB) Scan(value interface{}) error {
-	bytes, ok := value.([]byte)
+	bytesScan, ok := value.([]byte)
 	if !ok {
 		return fmt.Errorf("type assertion to []byte failed")
 	}
-	return json.Unmarshal(bytes, j)
+	return json.Unmarshal(bytesScan, j)
 }
 
-// Get FlowDefinition by reference_id the last version
+// GetFlowDefinitionByReferenceID Get FlowDefinition by reference_id the last version
 func (f *FlowDefinition) GetFlowDefinitionByReferenceID(db *gorm.DB, referenceID string) (*FlowDefinition, error) {
 	var flowDefinition FlowDefinition
 	result := db.Where("reference_id = ?", referenceID).Order("version desc").First(&flowDefinition)
@@ -110,7 +110,7 @@ func (f *FlowDefinition) GetFlowDefinitionByReferenceID(db *gorm.DB, referenceID
 	return &flowDefinition, nil
 }
 
-// Convert JSONB to String
+// ConvertJSONBToString Convert JSONB to String
 func ConvertJSONBToString(jsonb JSONB) (string, error) {
 	jsonData, err := json.Marshal(jsonb)
 	if err != nil {
@@ -119,7 +119,7 @@ func ConvertJSONBToString(jsonb JSONB) (string, error) {
 	return string(jsonData), nil
 }
 
-// Convert JSONB to map[string]interface{}{}
+// ConvertJSONBToMap Convert JSONB to map[string]interface{}{}
 func ConvertJSONBToMap(jsonb JSONB) (map[string]interface{}, error) {
 	jsonData, err := json.Marshal(jsonb)
 	if err != nil {
@@ -133,7 +133,7 @@ func ConvertJSONBToMap(jsonb JSONB) (map[string]interface{}, error) {
 	return data, nil
 }
 
-// Convert JSONB to SimplifiedSchema
+// ConvertJSONBToSimplifiedSchema Convert JSONB to SimplifiedSchema
 func ConvertJSONBToSimplifiedSchema(jsonb JSONB) (SimplifiedSchema, error) {
 	jsonData, err := json.Marshal(jsonb)
 	if err != nil {
@@ -147,7 +147,7 @@ func ConvertJSONBToSimplifiedSchema(jsonb JSONB) (SimplifiedSchema, error) {
 	return simplified, nil
 }
 
-// Convert SimplifiedSchema to JSONB
+// ConvertSimplifiedSchemaToJSONB Convert SimplifiedSchema to JSONB
 func ConvertSimplifiedSchemaToJSONB(simplified SimplifiedSchema, schemaData SchemaData) (JSONB, error) {
 	completeSchema, err := CompleteSchema(simplified, schemaData)
 	if err != nil {

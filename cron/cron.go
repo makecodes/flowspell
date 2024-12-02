@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type CronHandler struct {
+type Handler struct {
 	DB *gorm.DB
 }
 
@@ -24,7 +24,10 @@ func Start() {
 	c := cron.New()
 	// c.AddFunc("0 30 * * * *", func() { fmt.Println("Every hour on the half hour") })
 	// c.AddFunc("@hourly",      func() { fmt.Println("Every hour") })
-	c.AddFunc("@every 5s", func() { cronTasksHandler.QueueCleanup() })
+	_, err = c.AddFunc("@every 5s", func() { cronTasksHandler.QueueCleanup() })
+	if err != nil {
+		return
+	}
 	c.Start()
 	select {}
 }

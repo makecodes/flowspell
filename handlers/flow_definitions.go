@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"flowspell/models"
 	"net/http"
 	"strconv"
@@ -18,7 +19,7 @@ func (h *FlowDefinitionHandler) respondWithError(c *gin.Context, status int, err
 	c.JSON(status, gin.H{"error": err.Error()})
 }
 
-// Return all flow definitions
+// GetFlowDefinitions Return all flow definitions
 func (h *FlowDefinitionHandler) GetFlowDefinitions(c *gin.Context) {
 	limit := 25
 	offset := 0
@@ -55,7 +56,7 @@ func (h *FlowDefinitionHandler) GetFlowDefinitions(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// Create a new flow definition
+// CreateFlowDefinition Create a new flow definition
 func (h *FlowDefinitionHandler) CreateFlowDefinition(c *gin.Context) {
 	var flowDefinition models.FlowDefinition
 	if err := c.ShouldBindJSON(&flowDefinition); err != nil {
@@ -86,7 +87,7 @@ func (h *FlowDefinitionHandler) CreateFlowDefinition(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
-// Update a flow definition by its ID
+// UpdateFlowDefinition Update a flow definition by its ID
 func (h *FlowDefinitionHandler) UpdateFlowDefinition(c *gin.Context) {
 	referenceId := c.Param("referenceId")
 	flowDefinition, err := models.GetLastFlowDefinitionVersionFromReferenceID(h.DB, referenceId)
@@ -116,12 +117,12 @@ func (h *FlowDefinitionHandler) UpdateFlowDefinition(c *gin.Context) {
 	c.JSON(http.StatusCreated, response)
 }
 
-// Get a flow definition by its ID
+// GetFlowDefinition Get a flow definition by its ID
 func (h *FlowDefinitionHandler) GetFlowDefinition(c *gin.Context) {
 	referenceId := c.Param("referenceId")
 	flowDefinition, err := models.GetLastFlowDefinitionVersionFromReferenceID(h.DB, referenceId)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			h.respondWithError(c, http.StatusNotFound, err)
 		} else {
 			h.respondWithError(c, http.StatusInternalServerError, err)
@@ -132,7 +133,7 @@ func (h *FlowDefinitionHandler) GetFlowDefinition(c *gin.Context) {
 	c.JSON(http.StatusOK, flowDefinition)
 }
 
-// Delete a flow definition by its ID
+// DeleteFlowDefinition Delete a flow definition by its ID
 func (h *FlowDefinitionHandler) DeleteFlowDefinition(c *gin.Context) {
 	referenceId := c.Param("referenceId")
 	result := h.DB.Where("reference_id = ?", referenceId).Delete(&models.FlowDefinition{})
@@ -143,12 +144,12 @@ func (h *FlowDefinitionHandler) DeleteFlowDefinition(c *gin.Context) {
 	c.JSON(http.StatusNoContent, nil)
 }
 
-// handle the /schemas/flow_definitions/:referenceId/:type.json endpoint
+// GetFlowDefinitionSchema handle the /schemas/flow_definitions/:referenceId/:type.json endpoint
 func (h *FlowDefinitionHandler) GetFlowDefinitionSchema(c *gin.Context) {
 	referenceId := c.Param("referenceId")
 	flowDefinition, err := models.GetLastFlowDefinitionVersionFromReferenceID(h.DB, referenceId)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			h.respondWithError(c, http.StatusNotFound, err)
 		} else {
 			h.respondWithError(c, http.StatusInternalServerError, err)

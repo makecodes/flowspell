@@ -25,7 +25,10 @@ func init() {
 }
 
 func main() {
-	godotenv.Load()
+	err := godotenv.Load()
+	if err != nil {
+		return
+	}
 
 	// Set the CLI app commands
 	app.Commands = []cli.Command{
@@ -33,7 +36,10 @@ func main() {
 			Name:  "worker",
 			Usage: "Start FlowSpell worker",
 			Action: func(c *cli.Context) error {
-				worker.Worker()
+				err := worker.Worker()
+				if err != nil {
+					return err
+				}
 				return nil
 			},
 		},

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"flowspell/models"
 	"net/http"
 	"strconv"
